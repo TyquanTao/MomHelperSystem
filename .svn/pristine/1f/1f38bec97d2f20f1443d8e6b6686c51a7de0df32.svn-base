@@ -1,0 +1,67 @@
+package com.cn.pojo;
+
+
+public class Question {
+
+  private long questionId;
+  private String questionTitle;
+  private String questionContent;
+  private long userId;
+  private java.sql.Timestamp questionTime;
+  private long questionDel;
+
+
+  public long getQuestionId() {
+    return questionId;
+  }
+
+  public void setQuestionId(long questionId) {
+    this.questionId = questionId;
+  }
+
+
+  public String getQuestionTitle() {
+    return questionTitle;
+  }
+
+  public void setQuestionTitle(String questionTitle) {
+    this.questionTitle = questionTitle;
+  }
+
+
+  public String getQuestionContent() {
+    return questionContent;
+  }
+
+  public void setQuestionContent(String questionContent) {
+    this.questionContent = questionContent;
+  }
+
+
+  public long getUserId() {
+    return userId;
+  }
+
+  public void setUserId(long userId) {
+    this.userId = userId;
+  }
+
+
+  public java.sql.Timestamp getQuestionTime() {
+    return questionTime;
+  }
+
+  public void setQuestionTime(java.sql.Timestamp questionTime) {
+    this.questionTime = questionTime;
+  }
+
+
+  public long getQuestionDel() {
+    return questionDel;
+  }
+
+  public void setQuestionDel(long questionDel) {
+    this.questionDel = questionDel;
+  }
+
+}

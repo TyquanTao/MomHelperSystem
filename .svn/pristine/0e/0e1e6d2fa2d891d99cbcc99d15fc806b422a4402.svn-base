@@ -1,0 +1,50 @@
+package com.cn.service.impl;
+
+import com.cn.dao.AnswerMapper;
+import com.cn.dto.JsonResult;
+import com.cn.pojo.Answer;
+import com.cn.pojo.AnswerFabulous;
+import com.cn.service.AnswerService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * @author Tyquan
+ * @date 2019/11/30 11:42
+ */
+@Service
+@Transactional(rollbackFor = Throwable.class)
+public class AnswerServiceImpl implements AnswerService {
+    @Autowired
+    private AnswerMapper answerMapper;
+    @Override
+    public JsonResult addAnswer(Answer answer) {
+        Integer row = answerMapper.addAnswer(answer);
+        if (row == 0) {
+            return new JsonResult(404,"回答问题失败");
+        }
+        return new JsonResult(200,"回答问题成功！");
+    }
+
+    @Override
+    public JsonResult praiseAnswer(Integer userId, Integer answerId) {
+        //1 查询该用户是否已经点赞此回答
+        AnswerFabulous answerFabulous = new AnswerFabulous(userId,answerId);
+        AnswerFabulous answer = answerMapper.selectByAnswerFabulous(answerFabulous);
+        if (answer != null) {
+            return new JsonResult(405,"你已经给该回答点过赞了");
+        }
+        //2 把点赞记录 记录到关系表中
+        Integer row = answerMapper.addAnswerFabulous(answerFabulous);
+        if (row == 0) {
+            return new JsonResult(406,"点赞失败");
+        }
+        //3 回答表点赞次数加1
+        Integer points = answerMapper.updateAnswerPoints(answerId);
+        if (points == 0) {
+            return new JsonResult(407,"点赞成功！但数据库没有更新数据");
+        }
+        return new JsonResult(200,"点赞成功");
+    }
+}

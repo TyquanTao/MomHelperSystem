@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cn.dao.PostImgPostMapper">
+    <!--帖子与图片路径关系增加-->
+    <insert id="addPostImgPost" parameterType="int">
+        insert into post_img_post(post_id,pi_id) values(#{postId},#{piId})
+    </insert>
+
+    <!--通过帖子ID查询图片-->
+    <select id="findPostImgByPostId" resultMap="postImg">
+        select pi.*,i.post_url from post_img_post pi
+        left join post_img i on pi.pi_id=i.pi_id
+        where pi.post_id=#{postId}
+    </select>
+    
+    <resultMap id="postImg" type="com.cn.pojo.PostImg">
+        <id column="pi_id" property="piId"/>
+        <result column="post_url" property="postUrl"/>
+    </resultMap>
+</mapper>

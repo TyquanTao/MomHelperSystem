@@ -1,0 +1,56 @@
+import com.aliyuncs.exceptions.ClientException;
+import com.cn.dao.AdminMapper;
+import com.cn.pojo.Admin;
+import com.cn.utils.MD5Util;
+import com.cn.utils.RandomNumberUtil;
+import com.cn.utils.SendCodeUtil;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+/**
+ * Created with IntelliJ IDEA.
+ * User: wmy
+ * Date: 2019/11/28 10:02
+ * Description:
+ */
+@SuppressWarnings("all")
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration({
+        "classpath:spring-dao.xml"
+})
+public class Test_Wmy {
+
+    @Autowired
+    private AdminMapper adminMapper;
+
+    @Test
+    public void find(){
+        Admin admin = adminMapper.findByAdminName("admin");
+        System.out.println(admin);
+    }
+
+    @Test
+    public void md5(){
+        String s = MD5Util.MD55("111");
+        System.out.println(s);
+    }
+
+    @Test
+    public void code(){
+        System.out.println(RandomNumberUtil.getCode());
+    }
+
+    @Test
+    public void sendMsg(){
+        try {
+            SendCodeUtil.sendSms("17781029087",RandomNumberUtil.getCode());
+        } catch (ClientException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+}

@@ -1,0 +1,92 @@
+package com.cn.pojo;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+public class Answer implements Serializable {
+
+  private long answerId;
+  private long questionId;
+  private String answerContent;
+  private long userId;
+  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT-8")
+  private Timestamp answerTime;
+  private long answerDel;
+  private long answerPoints;
+
+  public Answer() {
+  }
+
+  public Answer(long questionId, String answerContent, long userId, Timestamp answerTime) {
+    this.questionId = questionId;
+    this.answerContent = answerContent;
+    this.userId = userId;
+    this.answerTime = answerTime;
+  }
+
+
+  public long getAnswerId() {
+    return answerId;
+  }
+
+  public void setAnswerId(long answerId) {
+    this.answerId = answerId;
+  }
+
+
+  public long getQuestionId() {
+    return questionId;
+  }
+
+  public void setQuestionId(long questionId) {
+    this.questionId = questionId;
+  }
+
+
+  public String getAnswerContent() {
+    return answerContent;
+  }
+
+  public void setAnswerContent(String answerContent) {
+    this.answerContent = answerContent;
+  }
+
+
+  public long getUserId() {
+    return userId;
+  }
+
+  public void setUserId(long userId) {
+    this.userId = userId;
+  }
+
+
+  public java.sql.Timestamp getAnswerTime() {
+    return answerTime;
+  }
+
+  public void setAnswerTime(java.sql.Timestamp answerTime) {
+    this.answerTime = answerTime;
+  }
+
+
+  public long getAnswerDel() {
+    return answerDel;
+  }
+
+  public void setAnswerDel(long answerDel) {
+    this.answerDel = answerDel;
+  }
+
+
+  public long getAnswerPoints() {
+    return answerPoints;
+  }
+
+  public void setAnswerPoints(long answerPoints) {
+    this.answerPoints = answerPoints;
+  }
+
+}

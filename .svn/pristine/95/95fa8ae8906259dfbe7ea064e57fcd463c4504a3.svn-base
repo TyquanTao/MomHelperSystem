@@ -1,0 +1,15 @@
+package com.cn.dao;
+
+import com.cn.pojo.Search;
+import org.apache.ibatis.annotations.Param;
+
+/**
+ * Created with IntelliJ IDEA.
+ * User: wmy
+ * Date: 2019/11/29 14:51
+ * Description:
+ */
+public interface SearchMapper {
+
+    Search addSearch(@Param("userId") Integer userId, @Param("searchMessage") String searchMessage);
+}

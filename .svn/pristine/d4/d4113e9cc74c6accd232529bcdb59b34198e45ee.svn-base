@@ -1,0 +1,20 @@
+package com.cn.dao;
+
+import com.cn.pojo.Circle;
+import com.cn.pojo.UserCircle;
+
+import java.util.List;
+
+/**
+ * @author 罗世杰
+ * @date 2019/11/28 21:22
+ */
+public interface UserCircleMapper {
+    /**
+     * 用户关注的圈子列表
+     * @from:罗世杰
+     * @param userId
+     * @return
+     */
+    List<UserCircle> findByUserId(Integer userId);
+}

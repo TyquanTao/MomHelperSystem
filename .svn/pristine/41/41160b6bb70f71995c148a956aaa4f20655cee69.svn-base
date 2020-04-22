@@ -1,0 +1,36 @@
+package com.cn.pojo.vo;
+
+import com.cn.pojo.Comment;
+
+public class CommentVo extends Comment{
+
+
+    //判断用户是否点赞
+    private Integer isLike;
+    //统计点赞数量
+    private Integer countFabulous;
+
+    public CommentVo() {
+    }
+
+    public CommentVo(Integer isLike, Integer countFabulous) {
+        this.isLike = isLike;
+        this.countFabulous = countFabulous;
+    }
+
+    public Integer getIsLike() {
+        return isLike;
+    }
+
+    public void setIsLike(Integer isLike) {
+        this.isLike = isLike;
+    }
+
+    public Integer getCountFabulous() {
+        return countFabulous;
+    }
+
+    public void setCountFabulous(Integer countFabulous) {
+        this.countFabulous = countFabulous;
+    }
+}

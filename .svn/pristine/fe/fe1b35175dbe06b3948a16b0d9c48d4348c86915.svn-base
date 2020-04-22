@@ -1,0 +1,33 @@
+package com.cn.service.impl;
+
+import com.cn.dao.CategoryMapper;
+import com.cn.dto.JsonResult;
+import com.cn.pojo.Category;
+import com.cn.service.CategoryService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+/**
+ * @author 罗世杰
+ * @date 2019/11/28 15:01
+ */
+@Service
+public class CategoryServiceImpl implements CategoryService {
+    @Autowired
+    private CategoryMapper categoryMapper;
+
+    /**
+     * 查询圈子大类列表
+     * @return
+     */
+    @Override
+    public JsonResult findAllCategory() {
+        List<Category> category = categoryMapper.findAllCategory();
+        if(category.size()==0){
+            return new JsonResult(4001,"查询失败！");
+        }
+        return new JsonResult(200,"success",category);
+    }
+}

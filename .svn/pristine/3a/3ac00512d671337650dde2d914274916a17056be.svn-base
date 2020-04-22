@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cn.dao.AnswerMapper">
+    <!--通过问题id查询answer-->
+    <select id="findAnswerByQuestionId" resultType="com.cn.pojo.Answer">
+        select answer_content,answer_time,answer_points from
+        answer where question_id = #{questionId} and answer_del = 0
+    </select>
+    <!--回答问题-->
+    <insert id="addAnswer" parameterType="Answer">
+        insert into answer(question_id, answer_content, user_id, answer_time)
+        values (#{questionId},#{answerContent},#{userId},#{answerTime})
+    </insert>
+    <!--查看是否已经点赞-->
+    <select id="selectByAnswerFabulous" resultType="com.cn.pojo.AnswerFabulous">
+        select  * from answer_fabulous
+        where user_id = #{userId} and answer_fabulous_id = #{answerFabulousId}
+    </select>
+    <!--添加一条点赞记录-->
+    <insert id="addAnswerFabulous" parameterType="AnswerFabulous">
+        insert into answer_fabulous(user_id, answer_fabulous_id) VALUES (#{userId},#{answerFabulousId})
+    </insert>
+    <!--更新回答表的点赞次数-->
+    <update id="updateAnswerPoints">
+        update answer set answer_points = answer_points + 1
+        where answer_id = #{answerId}
+    </update>
+    <update id="updateQuestionReply" parameterType="Answer">
+        update question set question_reply = question_reply + 1
+        where question_id = #{questionId}
+    </update>
+</mapper>

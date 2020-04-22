@@ -1,0 +1,265 @@
+package com.cn.web.controller;
+
+import com.cn.dto.JsonResult;
+import com.cn.pojo.Post;
+import io.swagger.annotations.*;
+import org.springframework.web.bind.annotation.*;
+
+/**
+ * @author 周鑫
+ *帖子后台管理控制
+ */
+
+@RestController
+@Api(tags = "周鑫-文章管理API", value="")
+public class PostManagementController {
+
+    /**
+     * 分页查询所有未推荐文章
+     * @param page 当前页
+     * @param pagesize 显示条数
+     * @return
+     */
+    @GetMapping("/posterior/postmanagement/notRecommend")
+    @ResponseBody
+    @ApiOperation(value="分页查询所有未推荐文章")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query",name = "page",value = "当前页",required = true,dataType = "int"),
+            @ApiImplicitParam(paramType = "query",name = "pagesize",value = "显示条数",required = true,dataType = "int")
+    })
+    public JsonResult cheakPostNotRecommend(Integer page,Integer pagesize){
+        return  null;
+    }
+
+    /**
+     * 分页查询所有推荐文章
+     * @param page 当前页
+     * @param pagesize  显示条数
+     * @return
+     */
+    @GetMapping("/posterior/postmanagement/recommend")
+    @ResponseBody
+    @ApiOperation(value="分页查询所有推荐文章")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query",name = "page",value = "当前页",required = true,dataType = "int"),
+            @ApiImplicitParam(paramType = "query",name = "pagesize",value = "显示条数",required = true,dataType = "int")
+    })
+    public JsonResult cheakPostRecommend(Integer page,Integer pagesize){
+        return  null;
+    }
+
+    /**
+     * 分页查询所有等待推荐审核文章
+     * @param page 当前页
+     * @param pagesize 显示条数
+     * @return
+     */
+    @GetMapping("/posterior/postmanagement/auditRecommend")
+    @ResponseBody
+    @ApiOperation(value="分页查询等待推荐审核的文章")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query",name = "page",value = "当前页",required = true,dataType = "int"),
+            @ApiImplicitParam(paramType = "query",name = "pagesize",value = "显示条数",required = true,dataType = "int")
+    })
+    public JsonResult cheakPostAuditRecommend(Integer page,Integer pagesize){
+        return  null;
+    }
+
+    /**
+     * 条件+分页查询未推荐文章
+     * @param page 当前页
+     * @param pagesize 显示条数
+     * @param post 条件查询实体
+     * @return
+     */
+    @GetMapping("/posterior/postmanagement/notRecommendByWhere")
+    @ResponseBody
+    @ApiOperation(value="条件+分页查询所有未推荐文章",notes = "通过json注入数据")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query",name = "page",value = "当前页",required = true,dataType = "int"),
+            @ApiImplicitParam(paramType = "query",name = "pagesize",value = "显示条数",required = true,dataType = "int"),
+            @ApiImplicitParam(paramType = "query",name = "post",value = "查询条件实体",required = true,dataType = "Post")
+    })
+    @ApiResponses({
+            @ApiResponse(code = 200,message="获取数据成功"),
+            @ApiResponse(code = 400,message="获取数据失败",response = Exception.class)
+    })
+    public JsonResult cheakPostNotRecommendByWhere(Integer page, Integer pagesize,@RequestBody Post post){
+        return  null;
+    }
+    /**
+     * 条件+分页查询推荐文章
+     * @param page 当前页
+     * @param pagesize 显示条数
+     * @param post 查询条件实体
+     * @return
+     */
+    @GetMapping("/posterior/postmanagement/recommendByWhere")
+    @ResponseBody
+    @ApiOperation(value="条件+分页查询推荐文章",notes = "通过json注入数据")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query",name = "page",value = "当前页",required = true,dataType = "int"),
+            @ApiImplicitParam(paramType = "query",name = "pagesize",value = "显示条数",required = true,dataType = "int"),
+            @ApiImplicitParam(paramType = "query",name = "post",value = "查询条件实体",required = true,dataType = "Post")
+    })
+    @ApiResponses({
+            @ApiResponse(code = 200,message="获取数据成功"),
+            @ApiResponse(code = 400,message="获取数据失败",response = Exception.class)
+    })
+    public JsonResult cheakPostRecommendByWhere(Integer page,Integer pagesize,@RequestBody Post post){
+        return  null;
+    }
+
+    /**
+     * 条件+分页查询等待推荐审核文章
+     * @param page 当前页
+     * @param pagesize 显示条数
+     * @param post 条件查询实体
+     * @return
+     */
+    @GetMapping("/posterior/postmanagement/auditRecommendBywhere")
+    @ResponseBody
+    @ApiOperation(value="条件+分页查询等待推荐审核文章" ,notes = "通过json注入数据")
+
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query",name = "page",value = "当前页",required = true,dataType = "int"),
+            @ApiImplicitParam(paramType = "query",name = "pagesize",value = "显示条数",required = true,dataType = "int"),
+            @ApiImplicitParam(paramType = "query",name = "post",value = "查询包装实体",required = true,dataType = "Post")
+    })
+    @ApiResponses({
+            @ApiResponse(code = 200,message="获取数据成功"),
+            @ApiResponse(code = 400,message="获取数据失败",response = Exception.class)
+    })
+    public JsonResult cheakPostAuditRecommendByWhere(Integer page,Integer pagesize,@RequestBody Post post){
+        return  null;
+    }
+
+    /**
+     * 后台管理员主动设置/通过审批 将文章设置为推荐
+     * @param postId 文章ID
+     * @return
+     */
+    @PutMapping("/posterior/postmanagement/updatePostRecommendById")
+    @ResponseBody
+    @ApiOperation(value="后台管理员主动设置/通过审批 将文章设置为推荐")
+    @ApiImplicitParam(paramType = "query",name = "postId",value = "文章ID",required = true,dataType = "int")
+    public JsonResult updatePostRecommendById(Integer postId){
+        return  null;
+    }
+
+    /**
+     * 后台管理员主动设置/通过审批 将批量文章设置为推荐
+     * @param postIdList 文章ID数组
+     * @return
+     */
+    @PutMapping("/posterior/postmanagement/updatePostRecommendByIdList")
+    @ResponseBody
+    @ApiOperation(value="后台管理员主动设置/通过审批 将批量文章设置为推荐")
+    @ApiImplicitParam(paramType = "query",name = "postIdList",value = "文章ID数组",required = true,dataType = "String")
+    public JsonResult updatePostRecommendByIdList(String postIdList){
+        return  null;
+    }
+
+    /**
+     * 后台管理员主动设置/通过审批 将文章设置为普通
+     *
+     */
+    @PutMapping("/posterior/postmanagement/updatePostNotRecommendById")
+    @ResponseBody
+    @ApiOperation(value="后台管理员主动设置/通过审批 将文章设置为普通")
+    @ApiImplicitParam(paramType = "query",name = "postId",value = "文章ID",required = true,dataType = "int")
+    public JsonResult updatePostNotRecommendById(Integer postId){
+        return  null;
+    }
+
+    /**
+     * 后台管理员主动设置/通过审批 将多个文章设置为普通
+     * @param postIdList 文章ID数组
+     * @return
+     */
+    @PutMapping("/posterior/postmanagement/updatePostNotRecommendByIdList")
+    @ResponseBody
+    @ApiOperation(value="后台管理员主动设置/通过审批 将多个文章设置为普通")
+    @ApiImplicitParam(paramType = "query",name = "postIdList",value = "文章ID数组",required = true,dataType = "String")
+    public JsonResult updatePostNotRecommendByIdList(String postIdList){
+        return  null;
+    }
+
+    /**
+     * 单个将文章放入回收站
+     @param postId 文章ID
+     * @return
+             */
+    @PutMapping("/posterior/postmanagement/removePostById")
+    @ResponseBody
+    @ApiOperation(value="单个将文章放入回收站")
+    @ApiImplicitParam(paramType = "query",name = "postId",value = "文章ID",required = true,dataType = "int")
+    public JsonResult removePostById(Integer postId){
+        return  null;
+    }
+
+    /**
+     * 批量将文章放入回收站
+    * @param postIdList 文章ID数组
+     * @return
+     */
+    @PutMapping("/posterior/postmanagement/removePostByIdList")
+    @ResponseBody
+    @ApiOperation(value="批量将文章放入回收站")
+    @ApiImplicitParam(paramType = "query",name = "postIdList",value = "文章ID数组",required = true,dataType = "String")
+    public JsonResult removePostByIdList(String postIdList){
+        return  null;
+    }
+
+    /**
+     * 单个将文章恢复为普通
+     * @param postId 文章ID
+     * @return
+     */
+    @PutMapping("/posterior/postmanagement/recoveryPostById(Integer")
+    @ResponseBody
+    @ApiOperation(value="单个将文章恢复为普通")
+    @ApiImplicitParam(paramType = "query",name = "postId",value = "文章ID",required = true,dataType = "int")
+    public JsonResult recoveryPostById(Integer postId){
+        return  null;
+    }
+
+    /**
+     * 批量将文章恢复为普通
+     @param postIdList 文章ID数组
+     * @return
+     */
+    @PutMapping("/posterior/postmanagement/recoveryPostByIdList")
+    @ResponseBody
+    @ApiOperation(value="批量将文章恢复为普通")
+    @ApiImplicitParam(paramType = "query",name = "postIdList",value = "文章ID数组",required = true,dataType = "String")
+    public JsonResult recoveryPostByIdList(String postIdList){
+        return  null;
+    }
+
+    /**
+     * 单个将文章彻底删除
+     * @param postId 文章ID
+     * @return
+      */
+    @DeleteMapping("/posterior/postmanagement/delPostById")
+    @ResponseBody
+    @ApiOperation(value="单个将文章彻底删除")
+    @ApiImplicitParam(paramType = "query",name = "postId",value = "文章ID",required = true,dataType = "int")
+    public JsonResult delPostById(Integer postId){
+        return  null;
+    }
+
+    /**
+     * 批量将文章彻底删除
+    * @param postIdList 文章ID数组
+     * @return
+             */
+    @DeleteMapping("/posterior/postmanagement/delPostByIdList")
+    @ResponseBody
+    @ApiOperation(value="批量将文章彻底删除")
+    @ApiImplicitParam(paramType = "query",name = "postIdList",value = "文章ID数组",required = true,dataType = "String")
+    public JsonResult delPostByIdList(String postIdList){
+        return  null;
+    }
+}

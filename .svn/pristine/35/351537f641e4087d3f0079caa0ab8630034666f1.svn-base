@@ -1,0 +1,253 @@
+package com.cn.service.impl;
+
+import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
+import com.aliyuncs.exceptions.ClientException;
+import com.cn.dao.UserMapper;
+import com.cn.dto.JsonResult;
+import com.cn.exception.JwtException;
+import com.cn.exception.UserException;
+import com.cn.pojo.Register;
+import com.cn.pojo.User;
+import com.cn.pojo.UserState;
+import com.cn.service.UserService;
+import com.cn.utils.RandomNumberUtil;
+import com.cn.utils.SendCodeUtil;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PutMapping;
+
+import java.util.List;
+
+import java.sql.Timestamp;
+
+@Service
+@SuppressWarnings("all")
+public class UserServiceImpl implements UserService {
+
+    @Autowired
+    private UserMapper userMapper;
+
+    /**
+     * 登录方法
+     * @param userPhone：用户的手机号（登陆账号
+     * @param password：密码
+     *               张鹏
+     * @return
+     */
+    @Override
+    public JsonResult<User> login(User user) {
+        User login = userMapper.login(user);
+        return new JsonResult<>(200,"success",login);
+    }
+
+
+    @Override
+    public String sendCode(String phone) {
+        String code = RandomNumberUtil.getCode();
+        try {
+            SendSmsResponse sendSmsResponse = SendCodeUtil.sendSms(phone, code);
+            //
+            addRegister(new Register(phone,code));
+            /*userMapper.addRegister(new Register(phone,code));*/
+        } catch (ClientException e) {
+            e.printStackTrace();
+        }
+        return code;
+    }
+
+    @Override
+    public Boolean judegRegister(Register register) {
+        Register registerAll = userMapper.findRegisterAll(register);
+        if (registerAll!=null){
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 查询临时记录表的记录
+     * @param phone
+     * @return
+     */
+    /*@Override
+    public Boolean findRegister(String phone) {
+        Register register = userMapper.findRegister(phone);
+        if (register!=null){
+            return true;
+        }
+        return false;
+    }*/
+
+    @Override
+    public Boolean addRegister(Register register) {
+        Register register1 = userMapper.findRegister(register.getRegisterPhone());
+        System.out.println("++++++++++++++++"+register1);
+        if (register1!=null){
+            Integer integer = userMapper.updateRegister(register);
+            System.out.println("++++++++11111+++++"+integer);
+            return true;
+        }else if(register1==null){
+            Integer integer = userMapper.addRegister(register);
+            System.out.println("+++++++22222++++++"+integer);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 注册用户
+     * @param user
+     * @return
+     */
+    @Override
+    public Boolean adduser(User user) {
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        user.setUserStartTime(timestamp);
+        Integer adduser = userMapper.adduser(user);
+        if (adduser>0){
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
+     * 判断用户的 状态
+     * @param id:用户的id
+     * @return
+     * 张鹏
+     */
+    @Override
+    public Boolean decideState(Integer id) {
+        UserState userState = userMapper.decideState(id);
+        if (userState.getStateId()==1){
+            return false;
+        }
+        return true;
+    }
+
+
+    @Override
+    public Boolean updateState(Integer userId, Integer stateId, Timestamp starttime) {
+        Integer integer = userMapper.updateState(userId, stateId,starttime);
+        System.out.println(integer);
+        if (integer>0){
+            return true;
+        }
+        return false;
+    }
+
+
+
+
+
+
+
+    ////////////////////////////////////////////////////管理员操作----李静的Mapper,放在下面/////////////////////////////////
+
+    /**
+     * 查找所有用户(含分页)
+     * @author 李静
+     * @param size
+     * @param sizePage
+     * @return
+     */
+    @Override
+    public PageInfo findAllUser(Integer size, Integer sizePage) throws UserException {
+        // 判断数据
+        if (size == null || sizePage == null)
+           throw new UserException(2004,"请求驳回！参数为空");
+        if (size == 0 || sizePage == 0)
+            throw new UserException(2005,"请求驳回！参数不正确");
+
+        // 正常返回数据
+        PageHelper pageHelper = new PageHelper();
+
+        pageHelper.startPage(size, sizePage);
+        // 获取全部用户
+        List<User> users = userMapper.findAllUser();
+
+        if (users == null)
+            // 数据库无数据
+            throw new UserException(204,"请求已处理，数据库无数据");
+
+        return new PageInfo(users);
+    }
+
+    /**
+     * 后台管理员根据条件查询用户信息
+     * @param size
+     * @param sizePage
+     * @param user
+     * @return
+     */
+    public PageInfo findUserByConditions(Integer size, Integer sizePage, User user) throws UserException {
+        // 判断数据
+        if (size == null || sizePage == null)
+            throw new UserException(2004,"请求驳回！参数为空");
+        if (size == 0 || sizePage == 0)
+            throw new UserException(2005,"请求驳回！参数不正确");
+
+        // 无数据
+        if (user == null)
+            return findAllUser(size, sizePage);
+
+        // 正常访问
+        PageHelper pageHelper = new PageHelper();
+
+        pageHelper.startPage(size, sizePage);
+        // 条件查询
+        List<User> users = userMapper.findUserByConditions(user);
+
+        if (users == null)
+            // 数据库无数据
+            throw new UserException(204,"请求已处理，数据库无数据");
+
+        return new PageInfo(users);
+    }
+
+    /**
+     * 根据用户Id
+     * @param userId
+     * @return
+     */
+    @Override
+    public User findUserById(Integer userId) {
+        // TODO:完善根据ID查找用户
+        return null;
+    }
+
+    ///////////////////////////////////////////////////保护屏障//////////////////////////////////////////////////////////
+
+    @Override
+    public Boolean updateUser(User user) {
+        Integer updateuser = userMapper.updateuser(user);
+        System.out.println(updateuser);
+        if (updateuser>0){
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public User findUserByUserid(Integer userId) {
+        User user = userMapper.findUser(userId);
+        if (user!=null){
+            return user;
+        }
+        return null;
+    }
+
+    @Override
+    public Integer countFants(Integer userId) {
+        Integer countFants = userMapper.countFants(userId);
+        return countFants;
+    }
+
+    @Override
+    public Boolean updateState(Integer userId, Integer stateId) {
+        return null;
+    }
+}

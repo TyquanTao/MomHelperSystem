@@ -1,0 +1,22 @@
+package com.cn.service;
+
+import com.cn.dto.JsonResult;
+import com.cn.pojo.Admin;
+
+/**
+ * Created with IntelliJ IDEA.
+ * User: wmy
+ * Date: 2019/11/28 9:39
+ * Description:
+ */
+public interface AdminService {
+
+    /**
+     * 登录
+     * @param adminName
+     * @param password
+     * @return
+     */
+    JsonResult<Admin> login(String adminName,String password);
+
+}

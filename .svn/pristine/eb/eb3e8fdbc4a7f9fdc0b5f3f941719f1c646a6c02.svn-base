@@ -1,0 +1,67 @@
+package com.cn.pojo;
+
+
+public class Answer {
+
+  private long answerId;
+  private long questionId;
+  private String answerContent;
+  private long userId;
+  private java.sql.Timestamp answerTime;
+  private long answerDel;
+
+
+  public long getAnswerId() {
+    return answerId;
+  }
+
+  public void setAnswerId(long answerId) {
+    this.answerId = answerId;
+  }
+
+
+  public long getQuestionId() {
+    return questionId;
+  }
+
+  public void setQuestionId(long questionId) {
+    this.questionId = questionId;
+  }
+
+
+  public String getAnswerContent() {
+    return answerContent;
+  }
+
+  public void setAnswerContent(String answerContent) {
+    this.answerContent = answerContent;
+  }
+
+
+  public long getUserId() {
+    return userId;
+  }
+
+  public void setUserId(long userId) {
+    this.userId = userId;
+  }
+
+
+  public java.sql.Timestamp getAnswerTime() {
+    return answerTime;
+  }
+
+  public void setAnswerTime(java.sql.Timestamp answerTime) {
+    this.answerTime = answerTime;
+  }
+
+
+  public long getAnswerDel() {
+    return answerDel;
+  }
+
+  public void setAnswerDel(long answerDel) {
+    this.answerDel = answerDel;
+  }
+
+}

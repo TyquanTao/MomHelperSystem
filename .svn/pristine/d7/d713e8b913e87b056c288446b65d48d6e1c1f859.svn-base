@@ -1,0 +1,143 @@
+package com.cn.pojo;
+
+import com.cn.groups.Login;
+import com.cn.groups.Update;
+import org.hibernate.validator.constraints.NotBlank;
+
+import javax.validation.constraints.Pattern;
+import java.io.Serializable;
+
+/**
+ * 管理员
+ */
+public class Admin implements Serializable {
+
+  private Integer adminId;
+
+  @NotBlank(message = "账号不能为空",groups = Login.class)
+  private String adminName;
+
+  @NotBlank(message = "呢称不能为空",groups = Update.class)
+  private String adminNickName;
+
+  @NotBlank(message = "电话号码不能为空",groups = Update.class)
+  @Pattern(regexp = "/^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/",message = "电话号码不符合规范",groups = Update.class)
+  private String adminPhone;
+
+  @NotBlank(message = "密码不能为空",groups = {Update.class,Login.class})
+  @Pattern(regexp = "/^[a-z0-9]{5,15}+$/",message = "密码不符合规范",groups = {Update.class})
+  private String adminPassword;
+  private String adminImgUrl;
+  private Integer isSuper;
+  private Integer adminDel;
+  private Integer adminSex;
+
+  public Admin() {
+  }
+
+  public Admin(Integer adminId, String adminNickName, String adminPhone, String adminImgUrl) {
+    this.adminId = adminId;
+    this.adminNickName = adminNickName;
+    this.adminPhone = adminPhone;
+    this.adminImgUrl = adminImgUrl;
+  }
+
+  public Admin(Integer adminId, String adminName, String adminPassword) {
+    this.adminId = adminId;
+    this.adminName = adminName;
+    this.adminPassword = adminPassword;
+  }
+
+  @Override
+  public String toString() {
+    return "Admin{" +
+            "adminId=" + adminId +
+            ", adminName='" + adminName + '\'' +
+            ", adminNickName='" + adminNickName + '\'' +
+            ", adminPhone='" + adminPhone + '\'' +
+            ", adminPassword='" + adminPassword + '\'' +
+            ", adminImgUrl='" + adminImgUrl + '\'' +
+            ", isSuper=" + isSuper +
+            ", adminDel=" + adminDel +
+            ", adminSex=" + adminSex +
+            '}';
+  }
+
+  public String getAdminNickName() {
+    return adminNickName;
+  }
+
+  public void setAdminNickName(String adminNickName) {
+    this.adminNickName = adminNickName;
+  }
+
+  public Integer getAdminId() {
+    return adminId;
+  }
+
+  public void setAdminId(Integer adminId) {
+    this.adminId = adminId;
+  }
+
+
+  public String getAdminName() {
+    return adminName;
+  }
+
+  public void setAdminName(String adminName) {
+    this.adminName = adminName;
+  }
+
+
+  public String getAdminPhone() {
+    return adminPhone;
+  }
+
+  public void setAdminPhone(String adminPhone) {
+    this.adminPhone = adminPhone;
+  }
+
+
+  public String getAdminPassword() {
+    return adminPassword;
+  }
+
+  public void setAdminPassword(String adminPassword) {
+    this.adminPassword = adminPassword;
+  }
+
+
+  public String getAdminImgUrl() {
+    return adminImgUrl;
+  }
+
+  public void setAdminImgUrl(String adminImgUrl) {
+    this.adminImgUrl = adminImgUrl;
+  }
+
+
+  public Integer getIsSuper() {
+    return isSuper;
+  }
+
+  public void setIsSuper(Integer isSuper) {
+    this.isSuper = isSuper;
+  }
+
+
+  public Integer getAdminDel() {
+    return adminDel;
+  }
+
+  public void setAdminDel(Integer adminDel) {
+    this.adminDel = adminDel;
+  }
+
+  public Integer getAdminSex() {
+    return adminSex;
+  }
+
+  public void setAdminSex(Integer adminSex) {
+    this.adminSex = adminSex;
+  }
+}

@@ -1,0 +1,47 @@
+package com.cn.service.impl;
+
+import com.cn.dao.QuestionMapper;
+import com.cn.dto.JsonResult;
+import com.cn.pojo.Question;
+import com.cn.service.QuestionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * @author Tyquan
+ * @date 2019/11/28 10:25
+ */
+@Service
+@Transactional(rollbackFor = Throwable.class)
+public class QuestionServiceImpl implements QuestionService {
+
+    @Autowired
+    private QuestionMapper questionMapper;
+
+    @Override
+    public JsonResult addQuestion(Question question) {
+        //获得受影响的行数
+        Integer rows = questionMapper.addQuestion(question);
+        //
+        if (rows>0) {
+            return new JsonResult(200,"提交问题成功！");
+        }
+        return new JsonResult(408,"提交问题失败!");
+    }
+
+    @Override
+    public JsonResult<Question> findQuestionById(Integer questionId) {
+        //校验问题id
+        if (questionId == null) {
+            return new JsonResult<>(307,"问题id不能为空！");
+        }
+        Question question = questionMapper.findQuestionById(questionId);
+        if (question == null) {
+            return new JsonResult<>(404,"你查看的问题已不存在！");
+        }
+        return new JsonResult<>(200,"查询问题详情成功",question);
+    }
+
+
+}

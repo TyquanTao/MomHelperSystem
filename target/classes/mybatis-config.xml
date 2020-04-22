@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+
+    <!-- 加载 java 的配置文件或者声明属性信息 -->
+    <!-- <properties resource="db.properties"/> -->
+    <settings>
+        <!--当返回行的所有列都是空时， MyBatis 默认返回 null-->
+        <setting name="returnInstanceForEmptyRow" value="true"/>
+        <!--显示 sql 语句-->
+        <setting name="logImpl" value="STDOUT_LOGGING"/>
+        <!--数据库的字段名的下划线 => pojo 属性中的 驼峰命名法-->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <!--开启二级缓存-->
+        <setting name="cacheEnabled" value="true" />
+    </settings>
+
+</configuration>

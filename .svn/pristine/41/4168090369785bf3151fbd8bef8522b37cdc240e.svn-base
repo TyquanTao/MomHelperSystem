@@ -1,0 +1,30 @@
+package com.cn.dao;
+
+import com.cn.pojo.User;
+import com.cn.pojo.UserState;
+
+public interface UserMapper {
+
+    /**
+     * 通过账号密码登录
+     * @param userPhone
+     * @return
+     */
+    public User login(Integer userPhone,String password);
+
+
+    /**
+     * 通过User的id判断user的当前状态
+     * @param userId
+     * @return
+     */
+    public UserState decideState(Integer userId);
+
+    /**
+     * 通过用户id修改用户当前的状态
+     * @param userId
+     * @return
+     */
+    public Integer updateState(Integer userId,Integer stateid);
+
+}

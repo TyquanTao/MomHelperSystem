@@ -1,0 +1,224 @@
+package com.cn.service;
+
+import com.cn.dto.JsonResult;
+import com.cn.exception.UserException;
+import com.cn.pojo.Register;
+import com.cn.pojo.State;
+import com.cn.pojo.User;
+import com.cn.pojo.UserState;
+import com.github.pagehelper.PageInfo;
+import io.swagger.models.auth.In;
+
+import java.sql.Timestamp;
+
+import java.util.List;
+
+public interface UserService {
+
+    /**
+     * 通过用户名密码登录
+     * @param user：用户的手机号（登陆账号
+     * @return
+     */
+    public JsonResult<User> login(User user);
+
+    /*public JsonResult<User> login(String userPhone,String password);*/
+
+    /**
+     * 通过user的id判断user的状态
+     * @param id:用户的id
+     * @return
+     */
+    public Boolean decideState(Integer id);
+
+    /**
+     * 通过用户的id修改用户的状态
+     * @param userId  用户的id
+     * @param stateId 状态的id
+     * @return
+     */
+    public Boolean updateState(Integer userId,Integer stateId,Timestamp starttime);
+
+    /**
+     * 通过用户的Id查询用户信息
+     * @param userId
+     * @return
+     */
+    public User findUserByUserid(Integer userId);
+    /**
+     * 修改用资料
+     * @param user
+     * @return
+     */
+    public Boolean updateUser(User user);
+
+    /**
+     * 查询用户的粉丝数量
+     * @param userId
+     * @return
+     */
+    public Integer countFants(Integer userId);
+    public Boolean updateState(Integer userId,Integer stateId);
+
+
+
+
+    ////////////////////////////////////////////////////管理员操作----李静的Mapper//////////////////////////////////////////////
+
+    /**
+     * 查找所有用户(含分页)
+     * @author 李静
+     * @param size
+     * @param sizePage
+     * @return
+     */
+    public PageInfo findAllUser(Integer size, Integer sizePage) throws UserException;
+
+    /**
+     * 查找被删除的用户(含分页)
+     * @author 李静
+     * @param size
+     * @param sizePage
+     * @return
+     */
+    public PageInfo findAllDelUser(Integer size, Integer sizePage) throws UserException;
+
+    /**
+     * 查询数据库所有的状态信息
+     * @author 李静
+     * @return
+     */
+    public List<State> findAllState();
+
+    /**
+     * 后台管理员根据条件查询用户信息
+     * @param size
+     * @param sizePage
+     * @param userName
+     * @param userState
+     * @author 李静
+     * @return
+     */
+    public PageInfo findUserByConditions(Integer size, Integer sizePage, String userName, Integer userState) throws UserException;
+
+    /**
+     * 根据用户Id
+     * @author 李静
+     * @param userId
+     * @return
+     */
+    public User findUserById(Integer userId) throws UserException;
+
+
+    /**
+     * 根据用户Id删除(假删)用户
+     * @author 李静
+     * @param userId
+     * @return 是否删除
+     */
+    public JsonResult delUserById(Integer userId) throws UserException;
+
+
+    /**
+     * 根据用户id组删除(假删)用户
+     * @author 李静
+     * @param ids
+     * @return
+     */
+    public JsonResult delUsers(List<Integer> ids) throws UserException;
+
+
+    /**
+     * 根据用户id恢复
+     * @param userId
+     * @return
+     */
+    public Boolean resumeUser(Integer userId) throws UserException;
+
+    /**
+     * 根据用户Id删除(真删)用户
+     * @author 李静
+     * @param userId
+     * @return 是否删除
+     */
+    public Boolean deleteUserById(Integer userId) throws UserException;
+
+
+    /**
+     * 根据用户id组删除(真删)用户
+     * @author 李静
+     * @param ids
+     * @return 是否删除成功
+     */
+    public Boolean deleteUsers(List<Integer> ids) throws UserException;
+    ////////////////////////////////////////////////////管理员操作----李静的Mapper//////////////////////////////////////////////
+
+    public String sendCode(String phone);
+    /**
+     * 注册方法
+     * @param user
+     * @return
+     */
+    public Boolean adduser(User user);
+
+
+    /**
+     * 对比手机号和验证码
+     * @param register
+     * @return
+     */
+    public Boolean judegRegister(Register register);
+
+    /**
+     * 向临时注册表添加记录
+     * @param register
+     * @return
+     */
+    public Boolean addRegister(Register register);
+
+
+
+    //////////////////////////////////////////////////// -- 尤翔龙 -- //////////////////////////////////////////////
+
+    /**
+     * 关注用户
+     * @author 尤翔龙
+     * @param userId
+     * @param followUserId
+     * @return
+     */
+    JsonResult followUser(Integer userId,Integer followUserId);
+
+    /**
+     * 取消关注用户
+     * @author 尤翔龙
+     * @param userId
+     * @param followUserId
+     * @return
+     */
+    JsonResult notFollowUser(Integer userId,Integer followUserId);
+
+//    /**
+//     * 判断是否已关注
+//     * @author 尤翔龙
+//     * @param userId
+//     * @param followUserId
+//     * @return
+//     */
+//    JsonResult isFollow(Integer userId,Integer followUserId);
+
+
+    /**
+     * 查询用户发表的帖子
+     * @param userId
+     * @return
+     */
+    JsonResult findPostByUserId(Integer userId);
+
+    /**
+     * 查询用户收藏的帖子
+     * @param userId
+     * @return
+     */
+    JsonResult findPostCollectByUserId(Integer userId);
+}

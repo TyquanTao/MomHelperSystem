@@ -1,0 +1,92 @@
+package com.cn.pojo.vo;
+
+import com.cn.pojo.Post;
+
+import java.sql.Timestamp;
+
+/**
+ * 此类为文章后台管理界面展示的内容
+ * @author 周鑫
+ */
+public class PostVo extends Post {
+
+    private Integer circleName;//文章所属小圈子名字
+    private Integer cateoryId;//文章所属大圈子Id
+    private Integer cateoryName;//文章所属大圈子名字
+    private Integer countFabulous;//文章点赞数统计
+    private Integer countComment;//文章帖子回复数
+    private Integer countCollection;//文章收藏统计
+
+    public PostVo() {
+    }
+
+    public PostVo(Integer postId, String postTitle, String postContent, String postImgUrl, Integer circleId, Integer postDel, Timestamp postTime, Integer userId, Integer isRecommend, Integer circleName, Integer cateoryId, Integer cateoryName, Integer countFabulous, Integer countComment, Integer countCollection) {
+        super(postId, postTitle, postContent, postImgUrl, circleId, postDel, postTime, userId, isRecommend);
+        this.circleName = circleName;
+        this.cateoryId = cateoryId;
+        this.cateoryName = cateoryName;
+        this.countFabulous = countFabulous;
+        this.countComment = countComment;
+        this.countCollection = countCollection;
+    }
+
+    @Override
+    public String toString() {
+        return "PostVo{" +
+                "circleName=" + circleName +
+                ", cateoryId=" + cateoryId +
+                ", cateoryName=" + cateoryName +
+                ", countFabulous=" + countFabulous +
+                ", countComment=" + countComment +
+                ", countCollection=" + countCollection +
+                '}';
+    }
+
+    public Integer getCircleName() {
+        return circleName;
+    }
+
+    public void setCircleName(Integer circleName) {
+        this.circleName = circleName;
+    }
+
+    public Integer getCateoryId() {
+        return cateoryId;
+    }
+
+    public void setCateoryId(Integer cateoryId) {
+        this.cateoryId = cateoryId;
+    }
+
+    public Integer getCateoryName() {
+        return cateoryName;
+    }
+
+    public void setCateoryName(Integer cateoryName) {
+        this.cateoryName = cateoryName;
+    }
+
+    public Integer getCountFabulous() {
+        return countFabulous;
+    }
+
+    public void setCountFabulous(Integer countFabulous) {
+        this.countFabulous = countFabulous;
+    }
+
+    public Integer getCountComment() {
+        return countComment;
+    }
+
+    public void setCountComment(Integer countComment) {
+        this.countComment = countComment;
+    }
+
+    public Integer getCountCollection() {
+        return countCollection;
+    }
+
+    public void setCountCollection(Integer countCollection) {
+        this.countCollection = countCollection;
+    }
+}

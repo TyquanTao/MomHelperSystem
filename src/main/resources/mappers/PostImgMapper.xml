@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cn.dao.PostImgMapper">
+    <insert id="addPostImg" parameterType="string">
+        insert into post_img(post_url) values(#{fileName})
+    </insert>
+    <select id="findAll" parameterType="string" resultType="com.cn.pojo.PostImg">
+      select pi_id,post_url from post_img where post_url=#{fileName}
+    </select>
+
+    <resultMap id="postImg" type="PostImg">
+        <id column="pi_id" property="piId"/>
+        <result column="pi_url" property="postUrl"/>
+    </resultMap>
+</mapper>

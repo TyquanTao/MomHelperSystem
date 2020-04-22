@@ -1,0 +1,141 @@
+package com.cn.dao;
+
+import com.cn.pojo.Post;
+import com.cn.pojo.vo.PostVo;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
+
+public interface PostMapper {
+    /**
+     * 发帖的方法
+     * @param post:帖子的实体对象
+     * @return
+     */
+    Integer addPost(Post post);
+
+    /**
+     * 通过推荐状态查找所有帖子
+     * 周鑫
+     * @param recommendState 推荐状态 0 未推荐，1审核，2已推荐
+     * @return
+     */
+    List<PostVo> findAllByRecommendState(Integer recommendState);
+
+    /**
+     * 通过推荐状态，条件查找帖子
+     * 周鑫
+     * @param recommendState 推荐状态 0 未推荐，1审核，2已推荐
+     * @param postVo 条件参数
+     * @return
+     */
+    List<PostVo> findAllByRecommendStateWhere(
+            @Param(value = "recommendState") Integer recommendState,
+            @Param(value = "postVo")  PostVo postVo);
+
+    /**
+     *查找回收站的所有文件
+     * 周鑫
+     * @return
+     */
+    List<PostVo> findAllByDelPost();
+
+    /**
+     *条件查找回收站的文件
+     * 周鑫
+     * @return
+     */
+    List<PostVo> findAllByDelPostWhere(PostVo postVo);
+
+    /**
+     *修改文章的推荐状态
+     * 周鑫
+     * @param recommendState 修改后的状态
+     * @param postId 修改文章ID
+     * @return
+     */
+    Integer updateRecommendByID(
+            @Param(value = "recommendState") Integer recommendState,
+            @Param(value = "postId") Integer postId);
+
+    /**
+     *批量修改文章的推荐状态
+     * 周鑫
+     * @param recommendState 修改后的状态
+     * @param postIds 修改文章Ids
+     * @return
+     */
+    Integer updateRecommendByIds(
+            @Param(value = "recommendState")Integer recommendState,
+            @Param(value = "postIds") String postIds);
+
+    /**
+     * 假删单个帖子
+     * 周鑫
+     * @param postId 修改文章Id
+     * @return
+     */
+    Integer  removePostById(Integer postId);
+
+    /**
+     * 假删多个帖子
+     * 周鑫
+     * @param postIds 修改文章Ids
+     * @return
+     */
+    Integer removePostByIds(String postIds);
+
+
+    /**
+     * 恢复单个帖子
+     * 周鑫
+     * @param postId 修改文章Id
+     * @return
+     */
+    Integer recoveryPostById(Integer postId);
+
+    /**
+     * 恢复多个帖子
+     * 周鑫
+     * @param postIds 修改文章Ids
+     * @return
+     */
+    Integer recoveryPostByIds(String postIds);
+
+    /**
+     * 彻底删除帖子
+     * 周鑫
+     * @param postId 彻底删除文章Id
+     * @return
+     */
+    Integer deletePostById(Integer postId);
+
+    /**
+     * 批量彻底删除帖子
+     * 周鑫
+     * @param postIds 彻底删除文章Ids
+     * @return
+     */
+    Integer deletePostByIds(String postIds);
+
+
+
+    /////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * 通过帖子ID删除帖子（软删）
+     * @author 尤翔龙
+     * @param postId
+     * @return
+     */
+     Boolean deleteByPostId(Integer postId);
+
+    /**
+     * 修改帖子内容
+     * @author 尤翔龙
+     * @param post
+     * @return
+     */
+     Integer updatePost(Post post);
+}

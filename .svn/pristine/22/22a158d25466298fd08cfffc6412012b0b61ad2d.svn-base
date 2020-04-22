@@ -1,0 +1,154 @@
+package com.cn.dao;
+
+import com.cn.pojo.Register;
+import com.cn.pojo.User;
+import com.cn.pojo.UserState;
+import org.apache.ibatis.annotations.Param;
+
+import java.sql.Timestamp;
+import java.util.List;
+
+public interface UserMapper {
+
+    /**
+     * 通过账号密码登录
+     * @param user
+     * @return
+     */
+    /*public User login(String userPhone,String password);*/
+    public User login(User user);
+
+
+    /**
+     * 注册用户
+     * @param user
+     * @return
+     */
+    public Integer adduser(User user);
+
+
+    /**
+     * 通过User的id判断user的当前状态
+     * @param userId
+     * @return
+     */
+    public UserState decideState(Integer userId);
+
+    /**
+     * 通过用户id修改用户当前的状态和当前状态的时间
+     * @param userId
+     * @return
+     */
+    public Integer updateState(Integer userId, Integer stateid, Timestamp starttime);
+
+
+    /**
+     * 通过用户的id查询用户
+     * @param userId
+     * @return
+     */
+
+    public User findUser(Integer userId);
+    /**
+     * 修改用户的资料
+     * @param user
+     * @return
+     */
+    public Integer updateuser(User user);
+
+    /**
+     * 通过用户的id统计该用户的粉丝数量
+     * @param userId
+     * @return
+     */
+    public Integer countFants(Integer userId);
+
+    /**
+     * 根据用户呢称模糊查询用户
+     * @param userName
+     * @return
+     */
+    List<User> findByUserName(@Param(value = "userName") String userName);
+
+
+    /**
+     * 通过手机号查询临时注册表
+     * @param phone
+     * @return
+     */
+    public Register findRegister(String phone);
+
+
+    /**
+     * 修改注册表的信息
+     * @param register
+     * @return
+     */
+    public Integer updateRegister(Register register);
+
+    /**
+     * 往临时表添加记录
+     * @param register
+     * @return
+     */
+    public Integer addRegister(Register register);
+
+    /**
+     * 判断手机号和验证码能否对应
+     * @param register
+     * @return
+     */
+    public Register findRegisterAll(Register register);
+
+
+
+
+
+
+
+
+
+
+
+
+    ////////////////////////////////////////////////////管理员操作----李静的Mapper/////////////////////////////////////////
+    /**
+     * 查找所有用户
+     * @author 李静
+     * @return
+     */
+    public List<User> findAllUser();
+
+
+    /**
+     * 后台管理员根据条件查询用户信息
+     * @author 李静
+     * @param user
+     * @return
+     */
+    public List<User> findUserByConditions(User user);
+
+
+    /**
+     * 根据用户Id
+     * @author 李静
+     * @param userId
+     * @return
+     */
+    public User findUserById(Integer userId);
+
+
+    /**
+     * 根据用户Id查找当前用户状态
+     * @author 李静
+     * @param userId
+     * @return
+     */
+    public UserState findStateByUserId(Integer userId);
+
+    ///////////////////////////////////////////////////管理员操作----李静的Mapper//////////////////////////////////////////
+
+    public Integer updateState(Integer userId,Integer stateid);
+
+
+}

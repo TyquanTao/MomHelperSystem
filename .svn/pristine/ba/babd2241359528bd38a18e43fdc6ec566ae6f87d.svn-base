@@ -1,0 +1,100 @@
+package com.cn.pojo;
+
+/**
+ * 管理员
+ */
+public class Admin {
+
+  private Integer adminId;
+  private String adminName;
+  private String adminPhone;
+  private String adminPassword;
+  private String adminImgUrl;
+  private Integer isSuper;
+  private Integer adminDel;
+
+  public Admin() {
+  }
+
+  public Admin(Integer adminId, String adminName, String adminPassword) {
+    this.adminId = adminId;
+    this.adminName = adminName;
+    this.adminPassword = adminPassword;
+  }
+
+  @Override
+  public String toString() {
+    return "Admin{" +
+            "adminId=" + adminId +
+            ", adminName='" + adminName + '\'' +
+            ", adminPhone='" + adminPhone + '\'' +
+            ", adminPassword='" + adminPassword + '\'' +
+            ", adminImgUrl='" + adminImgUrl + '\'' +
+            ", isSuper=" + isSuper +
+            ", adminDel=" + adminDel +
+            '}';
+  }
+
+  public Integer getAdminId() {
+    return adminId;
+  }
+
+  public void setAdminId(Integer adminId) {
+    this.adminId = adminId;
+  }
+
+
+  public String getAdminName() {
+    return adminName;
+  }
+
+  public void setAdminName(String adminName) {
+    this.adminName = adminName;
+  }
+
+
+  public String getAdminPhone() {
+    return adminPhone;
+  }
+
+  public void setAdminPhone(String adminPhone) {
+    this.adminPhone = adminPhone;
+  }
+
+
+  public String getAdminPassword() {
+    return adminPassword;
+  }
+
+  public void setAdminPassword(String adminPassword) {
+    this.adminPassword = adminPassword;
+  }
+
+
+  public String getAdminImgUrl() {
+    return adminImgUrl;
+  }
+
+  public void setAdminImgUrl(String adminImgUrl) {
+    this.adminImgUrl = adminImgUrl;
+  }
+
+
+  public Integer getIsSuper() {
+    return isSuper;
+  }
+
+  public void setIsSuper(Integer isSuper) {
+    this.isSuper = isSuper;
+  }
+
+
+  public Integer getAdminDel() {
+    return adminDel;
+  }
+
+  public void setAdminDel(Integer adminDel) {
+    this.adminDel = adminDel;
+  }
+
+}

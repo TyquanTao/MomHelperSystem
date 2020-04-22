@@ -1,0 +1,26 @@
+import com.cn.dao.PostMapper;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+@SuppressWarnings("all")
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration({
+        "classpath:spring-dao.xml"
+})
+public class YxlTest {
+
+    @Autowired
+    private PostMapper postMapper;
+
+    @Test
+    public void test01(){
+        Boolean aa = postMapper.deleteByPostId(1);
+        if (aa) {
+            System.out.println("删除成功");
+        }
+        System.out.println("删除失败");
+    }
+}

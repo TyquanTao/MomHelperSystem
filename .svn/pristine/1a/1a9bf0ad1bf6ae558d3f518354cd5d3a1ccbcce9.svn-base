@@ -1,0 +1,549 @@
+package com.cn.web.controller;
+
+import com.cn.dto.JsonResult;
+import com.cn.exception.UserException;
+import com.cn.pojo.Admin;
+import com.cn.pojo.Banner;
+import com.cn.pojo.User;
+import com.cn.service.BannerService;
+import com.cn.service.UserService;
+import com.cn.utils.JSONUtil;
+import com.cn.utils.StringUtil;
+import com.github.pagehelper.PageInfo;
+import io.swagger.annotations.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+/**
+ * @author lj
+ * @date 2019/11/27 12:55
+ */
+@SuppressWarnings("all")
+@RestController
+@Api(tags = "李静图片管理接口", value = "后台用户管理及图片管理")
+public class ImgController {
+
+    @Autowired
+    private UserService service;
+
+
+    //////////////////////////用户管理///////////////////////////
+
+    /**
+     * 展示所有用户列表
+     *
+     * @param size     : 分页
+     * @param sizePage : 每页条数
+     * @return : 多个用户
+     */
+    @GetMapping("admin/userList")
+    @ApiOperation(value = "展示所有用户列表", notes = "获取管理员管理用户的List数据")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "size", value = "第几页", required = true, dataType = "int", defaultValue = "1"),
+            @ApiImplicitParam(paramType = "query", name = "sizePage", value = "一页多少条", required = true, dataType = "int", defaultValue = "10")
+    })
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "获取数据成功"),
+            @ApiResponse(code = 205, message = "请求驳回！参数为空"),
+            @ApiResponse(code = 206, message = "请求驳回！参数不正确")
+    })
+    public JsonResult userList(@RequestParam("size") Integer size,
+                               @RequestParam("sizePage") Integer sizePage) throws UserException {
+        System.out.println("size=" + size + ",sizePage=" + sizePage);
+        PageInfo pageInfo = service.findAllUser(size, sizePage);
+        return new JsonResult(200, "获取成功", pageInfo);
+    }
+
+
+    /**
+     * 展示所有已删除的用户列表
+     *
+     * @param size     : 分页
+     * @param sizePage : 每页条数
+     * @return : 多个用户
+     */
+    @GetMapping("admin/delUserList")
+    @ApiOperation(value = "展示所有用户列表", notes = "获取管理员管理用户的List数据")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "size", value = "第几页", required = true, dataType = "int", defaultValue = "1"),
+            @ApiImplicitParam(paramType = "query", name = "sizePage", value = "一页多少条", required = true, dataType = "int", defaultValue = "10")
+    })
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "获取数据成功"),
+            @ApiResponse(code = 205, message = "请求驳回！参数为空"),
+            @ApiResponse(code = 206, message = "请求驳回！参数不正确")
+    })
+    public JsonResult delUserList(@RequestParam("size") Integer size,
+                                  @RequestParam("sizePage") Integer sizePage) throws UserException {
+        PageInfo pageInfo = service.findAllDelUser(size, sizePage);
+        return new JsonResult(200, "获取成功", pageInfo);
+    }
+
+
+    /**
+     * 查找用户-状态的全部信息
+     *
+     * @return
+     */
+    @GetMapping("admin/userStateList")
+    @ApiOperation(value = "用户状态的所有信息")
+    public JsonResult stateList() {
+        return new JsonResult(200, "获取成功", service.findAllState());
+    }
+
+    /**
+     * 根据详细条件查询用户，含分页
+     *
+     * @param user ： 用户对象
+     * @return ： 多个用户
+     */
+    @PostMapping("admin/findUserByConditions")
+    @ApiOperation(value = "条件查询用户", notes = "根据条件来查找用户的List数据(含分页)")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "size", value = "第几页", required = true, dataType = "int", defaultValue = "1"),
+            @ApiImplicitParam(paramType = "query", name = "sizePage", value = "一页多少条", required = true, dataType = "int", defaultValue = "10"),
+            @ApiImplicitParam(paramType = "query", name = "userName", value = "用户姓名", required = true, dataType = "string"),
+            @ApiImplicitParam(paramType = "query", name = "userState", value = "条件查询的条件,状态说明：1 还没有状态(默认) 2 备孕中 3 怀孕中 4 已出生", required = true, dataType = "int", defaultValue = "1"),
+    })
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "获取数据成功"),
+            @ApiResponse(code = 2004, message = "请求驳回！参数为空"),
+            @ApiResponse(code = 2005, message = "请求驳回！参数不正确")
+    })
+    public JsonResult findUserByConditions(@RequestParam(value = "size") Integer size,
+                                           @RequestParam(value = "sizePage") Integer sizePage,
+                                           @RequestParam(value = "userName") String userName,
+                                           @RequestParam(value = "userState") Integer userState) throws UserException {
+        System.out.println("前端获取数据"+userName+"电话"+userState);
+        return new JsonResult(200, "获取成功", service.findUserByConditions(size, sizePage, userName, userState));
+    }
+
+    /**
+     * 根据用户id查找用户
+     *
+     * @param userId : 用户id
+     * @return 用户信息
+     */
+    @GetMapping("admin/findUserbyId")
+    @ApiOperation(value = "根据Id查找用户", notes = "根据用户Id查找用户的详细信息")
+    @ApiImplicitParam(paramType = "query", name = "userId", value = "用户Id", required = true, dataType = "int")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "删除成功"),
+            @ApiResponse(code = 203, message = "用户Id为空"),
+            @ApiResponse(code = 204, message = "请求已处理，但无数据返回")
+    })
+    public JsonResult findUserById(@RequestParam(value = "userId") Integer userId) throws UserException {
+        return new JsonResult(200, "success", service.findUserById(userId));
+    }
+
+    /**
+     * 根据Id删除用户
+     *
+     * @param userId : 用户id
+     * @return
+     */
+    @PostMapping("admin/delUser")
+    @ApiOperation(value = "用户删除(假删)")
+    @ApiImplicitParam(paramType = "query", name = "userId", value = "用户id", required = true, dataType = "int")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "删除成功"),
+            @ApiResponse(code = 203, message = "用户Id为空"),
+            @ApiResponse(code = 204, message = "删除失败,无此用户")
+    })
+    public JsonResult userDel(@RequestParam(value = "userId") Integer userId) throws UserException {
+        System.out.println(userId);
+        return service.delUserById(userId);
+    }
+
+    /**
+     * 批量删除用户
+     *
+     * @param ids : 用户组
+     * @return
+     */
+    @PostMapping("admin/delUsers")
+    @ApiOperation(value = "批量删除(假删)用户")
+    @ApiImplicitParam(paramType = "query", name = "ids", value = "用户组id", required = true, dataType = "string")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "删除成功"),
+            @ApiResponse(code = 301, message = "删除失败"),
+            @ApiResponse(code = 207, message = "用户ids组参数有误")
+    })
+    public JsonResult usersDel(@RequestParam(value = "ids") String ids) throws UserException {
+        System.out.println("ids=" + ids);//+"\n分解ids="+StringUtil.conversionIds(ids));
+        return service.delUsers(StringUtil.conversionIds(ids));
+    }
+
+
+    /**
+     * 更改用户信息(从假删中恢复)
+     *
+     * @param userId
+     * @return
+     */
+    @PutMapping("admin/resumeUser")
+    @ApiOperation(value = "恢复(一个)用户删除状态")
+    @ApiImplicitParam(paramType = "query", name = "userId", value = "用户id", dataType = "int")
+    public JsonResult userResume(@RequestParam(value = "userId") Integer userId) throws UserException {
+        System.out.println("userId=" + userId);
+        if (service.resumeUser(userId)) {
+            return new JsonResult(200, "恢复成功！");
+        }
+        throw new UserException(300, "恢复失败！");
+    }
+
+    /**
+     * 真实删除用户(不可逆)
+     *
+     * @param userId : 用户id
+     * @return
+     */
+    @DeleteMapping("admin/deleteUser")
+    @ApiOperation(value = "真实删除用户", notes = "该操作不可逆，谨慎操作！")
+    @ApiImplicitParam(paramType = "query", name = "userId", value = "用户id", dataType = "int")
+    public JsonResult userDelete(@RequestParam(value = "userId") Integer userId) throws UserException {
+        if (service.deleteUserById(userId)) {
+            return new JsonResult(200, "删除成功");
+        }
+        throw new UserException(300, "删除失败！");
+    }
+
+    /**
+     * 真实删除用户组(多个用户)
+     *
+     * @param ids : 用户id组
+     * @return
+     */
+    @DeleteMapping("admin/deleteUsers")
+    @ApiOperation(value = "真实删除用户", notes = "该操作不可逆，谨慎操作！")
+    @ApiImplicitParam(paramType = "query", name = "ids", value = "用户id组", dataType = "string")
+    public JsonResult usersDelete(@RequestParam(value = "ids") String ids) throws UserException {
+        if (service.deleteUsers(JSONUtil.doIds(ids))) {
+            return new JsonResult(200, "删除成功");
+        }
+        throw new UserException(301, "删除失败");
+    }
+
+    ////////////////////////////////////////////////////管理员管理///////////////////////////////////////////////////////
+
+    /**
+     * 展示所有管理员列表
+     *
+     * @param size     : 分页
+     * @param sizePage : 每页条数
+     * @return
+     */
+    @GetMapping("admin/listAdmin")
+    @ApiOperation(value = "展示所有用户列表", notes = "此方法是超级管理员可操作的接口")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "size", value = "第几页", required = true, dataType = "int"),
+            @ApiImplicitParam(paramType = "query", name = "sizePage", value = "一页多少条", required = true, dataType = "int")
+    })
+    public JsonResult adminList(@RequestParam(value = "size") Integer size,
+                                @RequestParam(value = "sizePage") Integer sizePage) {
+        return null;
+    }
+
+    /**
+     * 根据详细条件查询管理员，含分页
+     *
+     * @param user
+     * @return
+     */
+    public JsonResult findAdminByConditions(@RequestParam(value = "size") Integer size,
+                                            @RequestParam(value = "sizePage") Integer sizePage, User user) {
+        return null;
+    }
+
+    /**
+     * 根据管理员id查找管理员
+     *
+     * @param adminId
+     * @return
+     */
+    public JsonResult findAdminById(@RequestParam(value = "adminId") Integer adminId) {
+        return new JsonResult(200, "success");
+    }
+
+    /**
+     * 管理员添加
+     *
+     * @param
+     * @return
+     */
+    @PostMapping("admin/addAdmin")
+    @ApiOperation(value = "用户添加", notes = "此方法是超级管理员可操作的接口")
+    @ApiImplicitParam(
+//            paramType = "query", body 自动对
+            paramType = "body",
+            name = "user",
+            value = "要添加的用户",
+            required = true,
+            dataType = "user"
+    )
+    public JsonResult adminAdd(@RequestBody User user) {
+        return null;
+    }
+
+
+    /**
+     * 根据Id删除用户(假删)
+     *
+     * @param adminId : 管理员id
+     * @return
+     */
+    @PutMapping("admin/delAdmin")
+    @ApiOperation(value = "管理员删除(假删)", notes = "此方法是超级管理员可操作的接口")
+    @ApiImplicitParam(paramType = "query", name = "adminId", value = "管理员id", required = true, dataType = "int")
+    public JsonResult adminDel(@RequestParam(value = "adminId") Integer adminId) {
+        return null;
+    }
+
+    /**
+     * 批量删除管理员
+     *
+     * @param ids : 用户组
+     * @return
+     */
+    @PutMapping("admin/delAdmins")
+    @ApiOperation(value = "批量删除管理员(假删)", notes = "此方法是超级管理员可操作的接口")
+    @ApiImplicitParam(paramType = "query", name = "ids", value = "管理员组id", required = true, dataType = "string")
+    public JsonResult adminsDel(@RequestParam(value = "ids") String ids) {
+        return null;
+    }
+
+
+    /**
+     * 更改管理员信息
+     * (不应该含有密码更改)
+     *
+     * @param user
+     * @return
+     */
+    @PutMapping("admin/updateAdmin")
+    @ApiOperation(value = "更改用户信息", notes = "此方法是超级管理员可操作的接口")
+    @ApiImplicitParam(paramType = "body", name = "admin", value = "", dataType = "Admin")
+    public JsonResult adminUpdate(@RequestBody Admin admin) {
+        return null;
+    }
+
+    /**
+     * 根据Id删除用户(真删)
+     *
+     * @param adminId : 管理员id
+     * @return
+     */
+    @PutMapping("admin/deleteAdmin")
+    @ApiOperation(value = "管理员删除(真删)", notes = "此方法是超级管理员可操作的接口，此方法不可逆，谨慎操作")
+    @ApiImplicitParam(paramType = "query", name = "adminId", value = "管理员id", required = true, dataType = "int")
+    public JsonResult adminDelete(@RequestParam(value = "adminId") Integer adminId) {
+        return null;
+    }
+
+    /**
+     * 批量删除管理员
+     *
+     * @param ids : 用户组
+     * @return
+     */
+    @PutMapping("admin/deleteAdmins")
+    @ApiOperation(value = "批量删除管理员(真删)", notes = "此方法是超级管理员可操作的接口，此方法不可逆，谨慎操作")
+    @ApiImplicitParam(paramType = "query", name = "ids", value = "管理员组id", required = true, dataType = "string")
+    public JsonResult adminsDelete(@RequestParam(value = "ids") String ids) {
+        return null;
+    }
+
+    //////////////////////////////////////////////////图片管理///////////////////////////////////////////////////////////
+
+    @Autowired
+    private BannerService bannerService;
+
+    /**
+     * 各个Banner首页展示
+     *
+     * @param bannerType ： Banner类型
+     * @return : 对应Banner类型的数据
+     */
+    @GetMapping("banner/list")
+    @ApiOperation(value = "各个Banner首页的展示问题")
+    @ApiImplicitParam(paramType = "query", name = "bannerType", value = "Banner的类型，0 圈子 1 主页 2  问答", required = true, dataType = "int")
+    public JsonResult showImgList(@RequestParam(value = "bannerType") Integer bannerType) {
+        System.out.println("BannerList下的BannerType=" + bannerType);
+        return bannerService.findBannerByBannerType(bannerType);
+    }
+
+    /**
+     * BannerList->编辑
+     * 根据Banner类型和BannerId查找具体的Banner
+     *
+     * @param bannerType ： Banner类型
+     * @param bannerId   ： BannerId
+     * @return
+     */
+    @GetMapping("banner/list/findByBannerId")
+    @ApiOperation(value = "Banner下某一条展示的具体内容")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "bannerType", value = "Banner的类型，0 圈子 1 主页 2  问答", required = true, dataType = "int"),
+            @ApiImplicitParam(paramType = "query", name = "bannerId", value = "BannerId-->具体的某一条", required = true, dataType = "int")
+    })
+    public JsonResult findBannerById(@RequestParam(value = "bannerType") Integer bannerType,
+                                     @RequestParam(value = "bannerId") Integer bannerId) {
+        System.out.println("Banner类型bannerType=" + bannerType + "\nBanner的Id bannerId=" + bannerId);
+        return bannerService.findBannerById(bannerType, bannerId);
+    }
+
+    /**
+     * 添加问答Banner图片
+     *
+     * @param bannerType ： Banner所属类型
+     * @param banner     : 要添加的banner对象
+     * @return : 操作是否成功
+     */
+    @PostMapping("banner/addQuestionBanner")
+    @ApiOperation(value = "问答Banner添加图片")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "bannerType", value = "Banner的类型，0 圈子 1 主页 2 问答 其他 ", required = true, dataType = "int"),
+            @ApiImplicitParam(paramType = "query", name = "bannerName", value = "Banner名称", required = true, dataType = "string"),
+            @ApiImplicitParam(paramType = "query", name = "questionId", value = "问答id", required = true, dataType = "int"),
+            @ApiImplicitParam(paramType = "query", name = "file", value = "上传的图片文件", required = true, dataType = "MultipartFile")
+    })
+    public JsonResult addQuestionBanner(@RequestParam(value = "bannerType") Integer bannerType,
+                                        @RequestParam(value = "bannerName") String bannerName,
+                                        @RequestParam(value = "questionId") Integer questionId,
+                                        @RequestParam(value = "file") MultipartFile file) {
+        // 验证前台传输的数据
+        System.out.println(bannerName + ":" + questionId);
+        return bannerService.addQuestionBanner(bannerType, bannerName, questionId, file);
+    }
+
+    /**
+     * 添加主页Banner图片
+     *
+     * @param bannerType ： Banner所属类型
+     * @param banner     : 要添加的banner对象
+     * @return : 操作是否成功
+     */
+    @PostMapping("banner/addUserBanner")
+    @ApiOperation(value = "社区Banner添加图片")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "bannerType", value = "Banner的类型，0 圈子 1 主页 2 问答 其他 ", required = true, dataType = "int"),
+            @ApiImplicitParam(paramType = "query", name = "bannerName", value = "Banner名称", required = true, dataType = "string"),
+            @ApiImplicitParam(paramType = "query", name = "postId", value = "文章id", required = true, dataType = "int"),
+            @ApiImplicitParam(paramType = "query", name = "file", value = "上传的图片文件", required = true, dataType = "MultipartFile")
+    })
+    public JsonResult addUserBanner(@RequestParam(value = "bannerType") Integer bannerType,
+                                    @RequestParam(value = "bannerName") String bannerName,
+                                    @RequestParam(value = "postId") Integer postId,
+                                    @RequestParam(value = "file") MultipartFile file) {
+        // 验证前台传输的数据
+        System.out.println(bannerName + ":" + postId);
+        System.out.println("前台文件"+file.getOriginalFilename());
+        return bannerService.addUserBanner(bannerType, bannerName, postId, file);
+    }
+
+    /**
+     * 添加圈子Banner图片
+     *
+     * @param bannerType ： Banner所属类型
+     * @param banner     : 要添加的banner对象
+     * @return : 操作是否成功
+     */
+    @PostMapping("banner/addCircleBanner")
+    @ApiOperation(value = "圈子Banner添加图片")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "bannerType", value = "Banner的类型，0 圈子 1 主页 2 问答 其他 ", required = true, dataType = "int"),
+            @ApiImplicitParam(paramType = "query", name = "bannerName", value = "Banner名称", required = true, dataType = "string"),
+            @ApiImplicitParam(paramType = "query", name = "file", value = "上传的图片文件", required = true, dataType = "MultipartFile")
+    })
+    public JsonResult addCircleBanner(@RequestParam(value = "bannerType") Integer bannerType,
+                                      @RequestParam(value = "bannerName") String bannerName,
+                                      @RequestParam(value = "file") MultipartFile file) {
+        // 验证前台传输的数据
+        System.out.println("前端数据" + bannerName + ":" + bannerType);
+        return bannerService.addCircleBanner(bannerType, bannerName, file);
+    }
+
+
+    /**
+     * 更改问答Banner图片
+     *
+     * @param banner     ：要更改成的Banner对象
+     * @return
+     */
+    @PostMapping("banner/updateQuestionBanner")
+    @ApiOperation(value = "问答Banner的更改")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "bannerName", value = "Banner名称", required = true, dataType = "string"),
+            @ApiImplicitParam(paramType = "query", name = "questionId", value = "问答id", required = true, dataType = "int"),
+            @ApiImplicitParam(paramType = "query", name = "bannerId", value = "Bannerid", required = true, dataType = "int"),
+            @ApiImplicitParam(paramType = "query", name = "file", value = "上传的图片文件", required = true, dataType = "MultipartFile")
+    })
+    public JsonResult updateQuestionBanner(@RequestParam(value = "bannerName") String bannerName,
+                                           @RequestParam(value = "bannerId") Integer bannerId,
+                                           @RequestParam(value = "questionId") Integer questionId,
+                                           @RequestParam(value = "file") MultipartFile file) {
+        System.out.println("前台传输的数据bannerName="+bannerName +"\nquestionId="+questionId+"\nfileName"+file.getOriginalFilename());
+        return bannerService.updateQuestionBanner(bannerName,bannerId,questionId,file);
+    }
+
+    /**
+     * 更改社区Banner图片
+     *
+     * @param banner     ：要更改成的Banner对象
+     * @return
+     */
+    @PostMapping("banner/updateUserBanner")
+    @ApiOperation(value = "社区Banner的更改")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "bannerName", value = "Banner名称", required = true, dataType = "string"),
+            @ApiImplicitParam(paramType = "query", name = "postId", value = "帖子id : 热帖", required = true, dataType = "int"),
+            @ApiImplicitParam(paramType = "query", name = "bannerId", value = "Bannerid", required = true, dataType = "int"),
+            @ApiImplicitParam(paramType = "query", name = "file", value = "上传的图片文件", required = true, dataType = "MultipartFile")
+    })
+    public JsonResult updateUserBanner(@RequestParam(value = "bannerName") String bannerName,
+                                       @RequestParam(value = "bannerId") Integer bannerId,
+                                       @RequestParam(value = "postId") Integer postId,
+                                       @RequestParam(value = "file") MultipartFile file) {
+        System.out.println("前台传输的数据bannerName="+bannerName +"\npostId="+postId+"\nfileName"+file.getOriginalFilename());
+        return bannerService.updateUserBanner(bannerName,bannerId,postId,file);
+    }
+
+    /**
+     * 更改圈子Banner图片
+     *
+     * @param banner     ：要更改成的Banner对象
+     * @return
+     */
+    @PostMapping("banner/updateCircleBanner")
+    @ApiOperation(value = "圈子Banner的更改")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "bannerName", value = "Banner名称", required = true, dataType = "string"),
+            @ApiImplicitParam(paramType = "query", name = "bannerId", value = "Bannerid", required = true, dataType = "int"),
+            @ApiImplicitParam(paramType = "query", name = "file", value = "上传的图片文件", required = true, dataType = "MultipartFile")
+    })
+    public JsonResult updateCircleBanner(@RequestParam(value = "bannerName") String bannerName,
+                                         @RequestParam(value = "bannerId") Integer bannerId,
+                                         @RequestParam(value = "file") MultipartFile file) {
+        System.out.println("前台传输的数据bannerName="+bannerName +"\nfileName"+file.getOriginalFilename());
+        return bannerService.updateCircleBanner(bannerName,bannerId,file);
+    }
+
+
+    /**
+     * 删除Banner图片
+     *
+     * @param bannerId ： Banner所属类型
+     * @return : 操作是否成功
+     */
+    @PostMapping("banner/delBanner")
+    @ApiOperation(value = "Banner删除图片")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "bannerId", value = "Banner的Id ", required = true, dataType = "int")
+    })
+    public JsonResult delBanner(@RequestParam(value = "bannerId") Integer bannerId) {
+        // 验证前台传输的数据
+        System.out.println("前台获取的数据BannerId :" + bannerId);
+        return bannerService.delBannerById(bannerId);
+    }
+}

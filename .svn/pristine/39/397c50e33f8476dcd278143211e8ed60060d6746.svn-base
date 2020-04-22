@@ -1,0 +1,14 @@
+package com.cn.service;
+
+import com.cn.dto.JsonResult;
+import com.cn.pojo.Post;
+
+public interface PostSerivce {
+    /**
+     * 通过帖子ID删除帖子（软删）
+     * @from 尤翔龙
+     * @param postId
+     * @return
+     */
+    JsonResult<Post> deleteByPostId(Integer postId);
+}

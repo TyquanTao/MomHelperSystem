@@ -1,0 +1,21 @@
+package com.cn.dao;
+
+import com.cn.pojo.Admin;
+
+/**
+ * Created with IntelliJ IDEA.
+ * User: wmy
+ * Date: 2019/11/28 9:32
+ * Description:
+ */
+public interface AdminMapper {
+
+    /**
+     * 根据呢称查找用户
+     * @param adminName
+     * @return
+     */
+    Admin findByName(String adminName);
+
+
+}

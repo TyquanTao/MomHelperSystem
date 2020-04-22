@@ -1,0 +1,375 @@
+package com.cn.web.controller;
+
+import com.cn.dto.JsonResult;
+import com.cn.exception.JwtException;
+import com.cn.exception.UserException;
+import com.cn.pojo.User;
+import com.cn.service.UserService;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import io.swagger.annotations.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * @author lj
+ * @date 2019/11/27 12:55
+ */
+@SuppressWarnings("all")
+@RestController
+@Api(tags = "李静图片管理接口", value = "后台用户管理及图片管理")
+public class ImgController {
+
+    @Autowired
+    private UserService service;
+
+
+    //////////////////////////用户管理///////////////////////////
+
+    /**
+     * 展示所有用户列表
+     *
+     * @param size     : 分页
+     * @param sizePage : 每页条数
+     * @return : 多个用户
+     */
+    @GetMapping("admin/userList")
+    @ApiOperation(value = "展示所有用户列表",notes = "获取管理员管理用户的List数据")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "size", value = "第几页", required = true, dataType = "int",defaultValue = "1"),
+            @ApiImplicitParam(paramType = "query", name = "sizePage", value = "一页多少条", required = true, dataType = "int",defaultValue = "10")
+    })
+    @ApiResponses({
+            @ApiResponse(code = 200,message = "获取数据成功")
+    })
+    public JsonResult userList(Integer size, Integer sizePage) throws UserException {
+        PageInfo pageInfo = service.findAllUser(size, sizePage);
+        return new JsonResult(200,"获取成功",pageInfo);
+    }
+
+    /**
+     * 根据详细条件查询用户，含分页
+     *
+     * @param user ： 用户对象
+     * @return ： 多个用户
+     */
+    @PostMapping("admin/findUserByConditions")
+    @ApiOperation(value = "条件查询用户",notes = "根据条件来查找用户的List数据(含分页)")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "size", value = "第几页", required = true, dataType = "int",defaultValue = "1"),
+            @ApiImplicitParam(paramType = "query", name = "sizePage", value = "一页多少条", required = true, dataType = "int",defaultValue = "10"),
+            @ApiImplicitParam(paramType = "body",name = "user",value = "条件查询的条件",required = true, dataType = "User")
+    })
+    @ApiResponses({
+            @ApiResponse(code = 200,message = "获取数据成功")
+    })
+    public JsonResult findUserByConditions(Integer size, Integer sizePage,
+                                           @RequestBody User user) {
+        PageHelper.startPage(size,sizePage);
+        List<User> lists = new ArrayList<>();
+        lists.add(new User(1,"臧三","111"));
+        lists.add(new User(2,"李四","123"));
+        PageInfo pageInfo = new PageInfo(lists);
+        return new JsonResult(200,"获取成功",pageInfo);
+    }
+
+
+    /**
+     * 根据用户id查找用户
+     *
+     * @param userId : 用户id
+     * @return 用户信息
+     */
+    @GetMapping("admin/findUserbyId")
+    @ApiOperation(value = "根据Id查找用户",notes = "根据用户Id查找用户的详细信息")
+    @ApiImplicitParam(paramType = "query", name = "userId", value = "用户Id", required = true,dataType = "int")
+    public JsonResult findUserById(Integer userId) {
+        return new JsonResult(200,"success",new User(3,"王五","123"));
+    }
+
+    /**
+     * 用户添加
+     *
+     * @param user : 要添加的用户信息
+     * @return
+     */
+    @PostMapping("admin/addUser")
+    @ApiOperation(value = "用户添加")
+    @ApiImplicitParam(
+//            paramType = "query", body 自动对
+            paramType = "body",
+            name = "user",
+            value = "要添加的用户",
+            required = true,
+            dataType = "user"
+    )
+    public JsonResult userAdd(@RequestBody User user) {
+        // TODO
+        // 调用Service的添加用户
+        return new JsonResult(200,"成功");
+    }
+
+
+    /**
+     * 根据Id删除用户
+     *
+     * @param userId : 用户id
+     * @return
+     */
+    @PostMapping("admin/delUser")
+    @ApiOperation(value = "用户删除(假删)")
+    @ApiImplicitParam(paramType = "query", name = "userId", value = "用户id", required = true, dataType = "int")
+    public JsonResult userDel(Integer userId) {
+        return null;
+    }
+
+    /**
+     * 批量删除用户
+     *
+     * @param ids : 用户组
+     * @return
+     */
+    @PostMapping("admin/delUsers")
+    @ApiOperation(value = "批量删除(假删)用户")
+    @ApiImplicitParam(paramType = "query", name = "ids", value = "用户组id", required = true, dataType = "string")
+    public JsonResult usersDel(String ids) {
+        return null;
+    }
+
+
+    /**
+     * 更改用户信息(从假删中恢复)
+     *
+     * @param userId
+     * @return
+     */
+    @PutMapping("admin/updateUser")
+    @ApiOperation(value = "恢复用户删除状态")
+    @ApiImplicitParam(paramType = "query", name = "userId", value = "用户id",dataType = "int")
+    public JsonResult userUpdate(Integer userId) {
+        return null;
+    }
+
+    /**
+     * 真实删除用户(不可逆)
+     * @param userId : 用户id
+     * @return
+     */
+    @DeleteMapping("admin/deleteUser")
+    @ApiOperation(value = "真实删除用户",notes = "该操作不可逆，谨慎操作！")
+    @ApiImplicitParam(paramType = "query", name = "userId", value = "用户id",dataType = "int")
+    public JsonResult userDelete(Integer userId) {
+        return new JsonResult(200,"success");
+    }
+
+    /**
+     * 真实删除用户组(多个用户)
+     * @param ids : 用户id组
+     * @return
+     */
+    @DeleteMapping("admin/deleteUsers")
+    @ApiOperation(value = "真实删除用户",notes = "该操作不可逆，谨慎操作！")
+    @ApiImplicitParam(paramType = "query", name = "ids", value = "用户id组",dataType = "string")
+    public JsonResult usersDelete(String ids) {
+        return new JsonResult(200,"success");
+    }
+
+    ////////////////////////////////////////////////////管理员管理///////////////////////////////////////////////////////
+
+    /**
+     * 展示所有管理员列表
+     *
+     * @param size     : 分页
+     * @param sizePage : 每页条数
+     * @return
+     */
+    @GetMapping("admin/listAdmin")
+    @ApiOperation(value = "展示所有用户列表",notes = "此方法是超级管理员可操作的接口")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "size", value = "第几页", required = true, dataType = "int"),
+            @ApiImplicitParam(paramType = "query", name = "sizePage", value = "一页多少条", required = true, dataType = "int")
+    })
+    public JsonResult adminList(Integer size, Integer sizePage) {
+        return null;
+    }
+
+    /**
+     * 根据详细条件查询管理员，含分页
+     *
+     * @param user
+     * @return
+     */
+    public JsonResult findAdminByConditions(Integer size, Integer sizePage, User user) {
+        return null;
+    }
+
+    /**
+     * 根据管理员id查找管理员
+     * @param adminId
+     * @return
+     */
+    public JsonResult findAdminById(Integer adminId) {
+        return new JsonResult(200,"success");
+    }
+
+    /**
+     * 管理员添加
+     *
+     * @param
+     * @return
+     */
+    @PostMapping("admin/addAdmin")
+    @ApiOperation(value = "用户添加",notes = "此方法是超级管理员可操作的接口")
+    @ApiImplicitParam(
+//            paramType = "query", body 自动对
+            paramType = "body",
+            name = "user",
+            value = "要添加的用户",
+            required = true,
+            dataType = "user"
+    )
+    public JsonResult adminAdd(@RequestBody User user) {
+        return null;
+    }
+
+
+    /**
+     * 根据Id删除用户(假删)
+     * @param adminId : 管理员id
+     * @return
+     */
+    @PutMapping("admin/delAdmin")
+    @ApiOperation(value = "管理员删除(假删)",notes = "此方法是超级管理员可操作的接口")
+    @ApiImplicitParam(paramType = "query", name = "adminId", value = "管理员id", required = true, dataType = "int")
+    public JsonResult adminDel(Integer adminId) {
+        return null;
+    }
+
+    /**
+     * 批量删除管理员
+     *
+     * @param ids : 用户组
+     * @return
+     */
+    @PutMapping("admin/delAdmins")
+    @ApiOperation(value = "批量删除管理员(假删)",notes = "此方法是超级管理员可操作的接口")
+    @ApiImplicitParam(paramType = "query", name = "ids", value = "管理员组id", required = true, dataType = "string")
+    public JsonResult adminsDel(String ids) {
+        return null;
+    }
+
+
+    /**
+     * 更改管理员信息
+     * (不应该含有密码更改)
+     *
+     * @param user
+     * @return
+     */
+    @PutMapping("admin/updateAdmin")
+    @ApiOperation(value = "更改用户信息",notes = "此方法是超级管理员可操作的接口")
+    @ApiImplicitParam(paramType = "query", name = "user", value = "",dataType = "String")
+    public JsonResult adminUpdate(String user) {
+        return null;
+    }
+
+    /**
+     * 根据Id删除用户(真删)
+     * @param adminId : 管理员id
+     * @return
+     */
+    @PutMapping("admin/deleteAdmin")
+    @ApiOperation(value = "管理员删除(真删)",notes = "此方法是超级管理员可操作的接口，此方法不可逆，谨慎操作")
+    @ApiImplicitParam(paramType = "query", name = "adminId", value = "管理员id", required = true, dataType = "int")
+    public JsonResult adminDelete(Integer adminId) {
+        return null;
+    }
+
+    /**
+     * 批量删除管理员
+     *
+     * @param ids : 用户组
+     * @return
+     */
+    @PutMapping("admin/deleteAdmins")
+    @ApiOperation(value = "批量删除管理员(真删)",notes = "此方法是超级管理员可操作的接口，此方法不可逆，谨慎操作")
+    @ApiImplicitParam(paramType = "query", name = "ids", value = "管理员组id", required = true, dataType = "string")
+    public JsonResult adminsDelete(String ids) {
+        return null;
+    }
+
+    ////////////////////////////////////////////////消息管理/////////////////////////////////////////////////////////////
+
+    /**
+     * 发送信息
+     *
+     * @param ids     : 要接收信息的用户组
+     * @param message : 信息的具体内容(后期用对象存储)
+     * @return : 发送状态是否成功....
+     */
+    @PostMapping("admin/message")
+    @ApiOperation(value = "管理员给用户发送信息")
+    public JsonResult sendMessage(String ids, String message) {
+        return null;
+    }
+
+    //////////////////////////////////////////////////图片管理///////////////////////////////////////////////////////////
+
+    /**
+     * Banner首页展示
+     *
+     * @param bannerType ： Banner类型
+     * @return : 对应Banner类型的数据
+     */
+    @GetMapping("banner/list")
+    @ApiOperation(value = "Banner展示的具体内容")
+    @ApiImplicitParam(paramType = "query", name = "bannerType", value = "Banner的类型，0 社区 1 主页 其他 问答", required = true, dataType = "int")
+    public JsonResult showImgList(@RequestParam Integer bannerType) {
+        return null;
+    }
+
+
+    /**
+     * 根据Banner类型和BannerId查找具体的Banner
+     * @param bannerType ： Banner类型
+     * @param bannerId ： BannerId
+     * @return
+     */
+    public JsonResult findBannerById(Integer bannerType,Integer bannerId) {
+        return new JsonResult(200,"success");
+    }
+
+    /**
+     * 添加Banner图片
+     *
+     * @param bannerType ： Banner所属类型
+     * @param banner      : 要添加的banner对象
+     * @return : 操作是否成功
+     */
+    @PostMapping("banner/add")
+    @ApiOperation(value = "Banner添加图片")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "bannerType", value = "Banner的类型，0 社区 1 主页 其他 问答", required = true, dataType = "int"),
+            @ApiImplicitParam(paramType = "body", name = "banner", value = "Banner对象", required = true, dataType = "Banner")
+            })
+    public JsonResult addBannerImg(Integer bannerType,
+                                   @RequestBody String banner) {
+        return new JsonResult(200,"success");
+    }
+
+
+    /**
+     * 更改Banner图片
+     * @param bannerType : 属于哪一个类型的Banner下的
+     * @param banner ：要更改成的Banner对象
+     * @return
+     */
+    public JsonResult updateBanner(Integer bannerType, String banner) {
+        return new JsonResult(200,"success");
+    }
+
+
+}

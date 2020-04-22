@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cn.dao.QuestionFabulousMapper">
+
+    <select id="findUserIdByQuestionId" resultType="QuestionFabulous">
+        select user_id
+        from question_fabulous where question_fabulous_id = #{questionId}
+    </select>
+</mapper>

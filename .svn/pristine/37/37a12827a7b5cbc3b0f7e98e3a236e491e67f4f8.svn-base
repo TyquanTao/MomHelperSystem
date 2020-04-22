@@ -1,0 +1,120 @@
+package com.cn.service;
+
+import com.cn.dto.JsonResult;
+import com.cn.exception.UserException;
+import com.cn.pojo.Register;
+import com.cn.pojo.User;
+import com.cn.pojo.UserState;
+import com.github.pagehelper.PageInfo;
+import io.swagger.models.auth.In;
+
+import java.sql.Timestamp;
+
+import java.util.List;
+
+public interface UserService {
+
+    /**
+     * 通过用户名密码登录
+     * @param user：用户的手机号（登陆账号
+     * @return
+     */
+    public JsonResult<User> login(User user);
+
+    /*public JsonResult<User> login(String userPhone,String password);*/
+
+    /**
+     * 通过user的id判断user的状态
+     * @param id:用户的id
+     * @return
+     */
+    public Boolean decideState(Integer id);
+
+    /**
+     * 通过用户的id修改用户的状态
+     * @param userId  用户的id
+     * @param stateId 状态的id
+     * @return
+     */
+    public Boolean updateState(Integer userId,Integer stateId,Timestamp starttime);
+
+    /**
+     * 通过用户的Id查询用户信息
+     * @param userId
+     * @return
+     */
+    public User findUserByUserid(Integer userId);
+    /**
+     * 修改用资料
+     * @param user
+     * @return
+     */
+    public Boolean updateUser(User user);
+
+    /**
+     * 查询用户的粉丝数量
+     * @param userId
+     * @return
+     */
+    public Integer countFants(Integer userId);
+    public Boolean updateState(Integer userId,Integer stateId);
+
+
+
+
+    ////////////////////////////////////////////////////管理员操作----李静的Mapper//////////////////////////////////////////////
+
+    /**
+     * 查找所有用户(含分页)
+     * @author 李静
+     * @param size
+     * @param sizePage
+     * @return
+     */
+    public PageInfo findAllUser(Integer size, Integer sizePage) throws UserException;
+
+    /**
+     * 后台管理员根据条件查询用户信息
+     * @param size
+     * @param sizePage
+     * @param user
+     * @return
+     */
+    public PageInfo findUserByConditions(Integer size, Integer sizePage, User user) throws UserException;
+
+    /**
+     * 根据用户Id
+     * @param userId
+     * @return
+     */
+    public User findUserById(Integer userId);
+
+    public String sendCode(String phone);
+    /**
+     * 注册方法
+     * @param user
+     * @return
+     */
+    public Boolean adduser(User user);
+
+
+    /**
+     * 对比手机号和验证码
+     * @param register
+     * @return
+     */
+    public Boolean judegRegister(Register register);
+
+    /**
+     * 向临时注册表添加记录
+     * @param register
+     * @return
+     */
+    public Boolean addRegister(Register register);
+
+
+
+    ////////////////////////////////////////////////////管理员操作----李静的Mapper//////////////////////////////////////////////
+
+
+}

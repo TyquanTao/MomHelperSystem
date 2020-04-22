@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cn.dao.MessageMapper">
+
+    <!--消息创建-->
+    <insert id="creatMessage" parameterType="Message" useGeneratedKeys="true"  keyProperty="messageId" >
+        insert into  message
+        values (null,#{messageTitle},#{messageText},#{messageTime},#{userId})
+    </insert>
+
+    <!--创建消息-接收用户的关系-->
+    <insert id="creatMessageToUser" >
+        insert into user_message(message_id,user_id) values
+        <foreach collection="receiveUserIds" index="index" item="item" separator="),(" open="(" close=")">
+            #{messageId},#{item}
+        </foreach>
+    </insert>
+
+    <!--用户修改阅读消息的状态-->
+    <update id="updateMessageState">
+        update user_message set is_read = 1 where um_id = #{messageId}
+    </update>
+    <!--用户假删除自己接收的消息-->
+    <update id="removeMessage">
+          update user_message set is_del= 1 where um_id = #{messageId}
+    </update>
+
+    <resultMap id="messageMap" type="Message">
+        <id property="messageId" column="um_id"/>
+        <!--消息标题-->
+        <result property="messageTitle" column="message_title"/>
+        <!--消息内容-->
+        <result property="messageText" column="message_text"/>
+        <!--消息发送时间-->
+        <result property="messageTime" column="message_time"/>
+        <!--发消息的用户ID-->
+        <result property="userId" column="user_id"/>
+        <!--发消息的用户-->
+        <result property="userName" column="user_name"/>
+
+    </resultMap>
+    <!--用户查询自己接收的消息-->
+    <select id="cheakMessageByRecipient" resultMap="messageMap">
+        select um.um_id,m.message_title,m.message_text,m.message_time,m.user_id,u.user_name from user_message um
+        left  join  message m on um.message_id = m.message_id
+        left join user u on u.user_id = m.user_id
+        where um.user_id = #{userId} and um.is_del = 0
+    </select>
+</mapper>

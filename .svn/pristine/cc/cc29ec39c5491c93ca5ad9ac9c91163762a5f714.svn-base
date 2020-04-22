@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cn.dao.AdminMapper">
+
+    <!--修改密码-->
+    <update id="updateAdminPassword">
+        update admin set admin_password = #{adminPassword} where adminId = #{adminId}
+    </update>
+    <!--修改个人信息-->
+    <update id="updateAdminMessage">
+        update admin set admin_nickName = #{adminNickName},admin_phone = #{adminPhone},admin_img_url = #{adminImgUrl}
+        where admin_id = #{adminId}
+    </update>
+
+    <!--根据呢称查询用户-->
+    <select id="findByAdminName" resultType="com.cn.pojo.Admin">
+        select * from admin where admin_name = #{adminName}
+    </select>
+
+    <!--通过电话和呢称查找-->
+    <select id="findByAdminNameAndAdminPhone" resultType="com.cn.pojo.Admin">
+        select * from admin where admin_name = #{adminName} and admin_phone = #{adminPhone}
+    </select>
+
+    <!--通过Id查询用户-->
+    <select id="findByAdminId" resultType="com.cn.pojo.Admin">
+        select * from admin where admin_id = #{adminId}
+    </select>
+    <!--判断电话号码是否注册-->
+    <select id="findByAdminPhone" resultType="java.lang.String">
+        select admin_phone from admin where admin_phone = #{adminPhone}
+    </select>
+
+    <!-- ///////////////////////////////////////////////////管理员操作-李静的Mapper,放在下面///////////////////////////////// -->
+
+    <resultMap id="adminMap" type="Admin">
+        <id property="adminId" column="admin_id" />
+        <result property="adminNickName" column="admin_nickName" />
+        <result property="adminName" column="admin_name" />
+        <result property="adminPhone" column="admin_phone" />
+        <result property="adminPassword" column="admin_password" />
+        <result property="adminImgUrl" column="admin_img_url" />
+        <result property="isSuper" column="is_super" />
+        <result property="adminDel" column="admin_del" />
+        <result property="adminSex" column="admin_sex" />
+    </resultMap>
+
+    <!--查找所有管理员信息-->
+    <select id="findAllAdmin" resultMap="adminMap">
+        select admin_id,admin_name,admin_nickName,admin_phone,admin_password,admin_img_url,is_super,adimin_del,admin_sex
+        from admin where admin_del=0
+    </select>
+
+    <!--查找所有管理员信息-->
+    <select id="findAllDelAdmin" resultMap="adminMap">
+        select admin_id,admin_name,admin_nickName,admin_phone,admin_password,admin_img_url,is_super,adimin_del,admin_sex
+        from admin where admin_del=1
+    </select>
+
+    <!--模糊查询 根据管理员提供的 姓名模糊 及昵称-->
+    <select id="findAdminByConditions" resultMap="adminMap">
+        select admin_id,admin_name,admin_nickName,admin_phone,admin_password,admin_img_url,is_super,adimin_del,admin_sex
+        from admin a
+        <where>
+            a.admin_del = 0
+            <!--'%${bussName}%'-->
+            <if test="param1 != null and param1 != ''">
+                and a.admin_name like concat('%',#{param1},'%')
+            </if>
+            <if test="param2 != null and param2 != 1">
+                and a.admin_nickName like concat('%',#{param2},'%')
+            </if>
+        </where>
+    </select>
+
+    <!--根据管理员id查找管理员-->
+    <select id="findAdminById" resultMap="adminMap">
+        select admin_id,admin_name,admin_nickName,admin_phone,admin_password,admin_img_url,is_super,adimin_del,admin_sex
+         from admin where admin_id=#{adminId} order by admin_id
+    </select>
+
+    <!--根据管理员id删除(假删)管理员-->
+    <update id="delAdmin">
+        update admin set admin_del = 1 where admin_id=#{adminId}
+    </update>
+
+    <!--根据管理员id组删除(假删)管理员-->
+    <update id="delAdmins">
+        update admin set admin_del = 1  where admin_id in
+        <foreach collection="ids" index="index" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!--根据管理员id恢复管理员-->
+    <update id="resumeAdmin">
+        update admin set admin_del = 0 where admin_id=#{adminId}
+    </update>
+
+    <!--根据管理员id删除(真删)管理员-->
+    <delete id="deleteAdmin">
+        delete from admin where admin_id=#{adminId}
+    </delete>
+
+    <!--根据管理员id组删除(真删)管理员-->
+    <update id="deleteAdmins">
+        delete from admin where admin_id in
+        <foreach collection="ids" index="index" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!--添加管理员-->
+    <insert id="addAdmin">
+        insert into admin (admin_nickName, admin_name, admin_phone, admin_password, admin_sex)
+        values (#{adminNickName},#{adminName},#{adminPhone},#{adminPassword},#{adminSex})
+    </insert>
+
+    <!-- ///////////////////////////////////////////////////管理员操作-李静的Mapper下面///////////////////////////////// -->
+
+</mapper>

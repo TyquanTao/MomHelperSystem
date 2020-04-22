@@ -1,0 +1,15 @@
+package com.cn.service;
+
+import com.cn.dto.JsonResult;
+import com.cn.pojo.Comment;
+
+public interface CommentService {
+
+    /**
+     * 添加评论
+     * @author 尤翔龙
+     * @param comment
+     * @return
+     */
+    JsonResult<Comment> addComment(Comment comment);
+}

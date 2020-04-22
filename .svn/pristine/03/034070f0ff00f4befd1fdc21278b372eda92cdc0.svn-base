@@ -1,0 +1,255 @@
+package com.cn.web.controller;
+
+import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
+import com.cn.dto.JsonResult;
+import com.cn.pojo.Register;
+import com.cn.pojo.User;
+import com.cn.service.UserService;
+import com.cn.utils.JwtUtil;
+import com.cn.utils.RandomNumberUtil;
+import com.cn.utils.SendCodeUtil;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.sql.Timestamp;
+
+@RestController
+@Api(tags = "张鹏用户API",value = "zz")
+public class ZpUserController {
+
+    @Autowired
+    private UserService zpuserService;
+    /**
+     * 登录的方法，通过手机号+密码
+     * @return
+     */
+    /*@PostMapping("/zp/user/loginByPassword")
+    @ApiOperation(value = "登陆方法")
+    @ApiImplicitParams({
+            @ApiImplicitParam(required = true,paramType = "query",name = "phone",value = "电话号",dataType = "String"),
+            @ApiImplicitParam(required = true,paramType = "query",name = "password",value = "密码",dataType = "String"),
+    })
+    public JsonResult loginByPassword(String phone,String password){
+
+        JsonResult<User> login = zpuserService.login(phone, password);
+        //生成token
+        String token = JwtUtil.sign(login, login.getData().getUserId());
+
+        return new JsonResult(200,"success",token,login.getData().getUserId());
+    }*/
+
+    /**
+     * 登录的方法，通过手机号+密码
+     * @return
+     */
+    @PostMapping("/zp/user/loginByPassword")
+    @ApiOperation(value = "账号密码登录")
+    @ApiImplicitParam(paramType = "body",name = "user",value = "修改类",dataType = "User")
+    public JsonResult loginByPassword(@RequestBody User user){
+        System.out.println(user);
+
+        JsonResult<User> login = zpuserService.login(user);
+        //生成token
+        String token = JwtUtil.sign(login, login.getData().getUserId());
+
+        return new JsonResult(200,"success",token,login.getData().getUserId());
+    }
+
+
+    /**
+     * 登录的方法，通过手机号+验证码
+     * @return
+     */
+    @GetMapping("/zp/user/loginByCode")
+    @ApiOperation(value = "登陆方法")
+    @ApiImplicitParam()
+    public JsonResult loginByCode(){
+
+        return new JsonResult(200,"success");
+    }
+
+
+    /**
+     * 发送验证码
+     * @param phone
+     * @return
+     */
+    @PostMapping("/zp/user/sendcode")
+    @ApiOperation(value = "手机号")
+    @ApiImplicitParam(paramType = "query",name="id",value = "查询的id",required = true,dataType = "int")
+    public JsonResult sendCode(String phone){
+        String sendCode = zpuserService.sendCode(phone);
+
+        return new JsonResult(200,"success");
+    }
+    @PostMapping("zp/register/judegRegister")
+    @ApiOperation(value = "对比手机号和验证码")
+    @ApiImplicitParam(paramType = "body",name = "rgister",value = "注册表",dataType = "Register")
+    public JsonResult judegRegister(@RequestBody Register register){
+        Boolean aBoolean = zpuserService.judegRegister(register);
+        if(aBoolean){
+            return new JsonResult(200,"正确");
+        }
+        return new JsonResult(800,"不正确");
+    }
+
+    /**
+     * 保存验证码
+     * @param register
+     * @return
+     */
+    @PostMapping("/zp/register/addregister")
+    @ApiOperation(value = "注册表")
+    @ApiImplicitParam(paramType = "body",name = "rrgister",value = "修改类",dataType = "Register")
+    public String addCode(@RequestBody Register register){
+        zpuserService.addRegister(register);
+        return null;
+    }
+
+    /**
+     * 注册的方法
+     * @param user:注册用的手机号
+
+     * @return
+     */
+    @PostMapping("/zp/user/register")
+    @ApiOperation(value = "注册的方法")
+    @ApiImplicitParam(paramType = "body",name = "user",value = "添加",dataType = "User")
+    public JsonResult register(@RequestBody User user){
+        Boolean adduser = zpuserService.adduser(user);
+        if (adduser){
+            return new JsonResult(200,"注册成功",user);
+        }
+        return new JsonResult(10000,"失败");
+    }
+
+    /**
+     * 查询自己信息的方法
+     * @param id：需要的参数
+     * @return
+     */
+    @PostMapping("/zp/user/findMyself")
+    @ResponseBody
+    @ApiOperation(value = "查询个人信息")
+    @ApiImplicitParam(paramType = "query",name="id",value = "查询的id",required = true,dataType = "int")
+    public JsonResult findMyself(Integer id){
+        User user = zpuserService.findUserByUserid(id);
+        return new JsonResult(200,"success",user);
+    }
+
+    /**
+     * 修改自己的个人信息
+     * @param user：修改的类
+     * @return
+     */
+    @PostMapping("/zp/user/updateMyself")
+    @ApiOperation(value = "修改个人信息")
+    @ApiImplicitParam(paramType = "body",name = "user",value = "修改类",dataType = "User")
+    public JsonResult updateMyself(@RequestBody User user){
+        Boolean updateUser = zpuserService.updateUser(user);
+        if (updateUser){
+            return new JsonResult(200,"修改成功");
+        }
+        return new JsonResult(2001,"修改失败");
+    }
+
+    /**
+     * 判断用户的状态
+     * @param id
+     * @return
+     */
+    @PostMapping("/zp/user/decideState")
+    @ApiOperation(value = "判断用户的状态")
+    @ApiImplicitParam(paramType = "query",name = "userId",value = "用户的id",required = true,dataType = "int")
+    public JsonResult decideState(Integer id){
+        Boolean decideState = zpuserService.decideState(id);
+        if (decideState==true){
+            return new JsonResult(200,"success",decideState);
+        }
+        return new JsonResult(1001,"第一次登陆",decideState);
+    }
+
+    /**
+     * 修改用户的状态
+     * @param userId
+     * @param stateId
+     * @return
+     */
+    @PostMapping("/zp/user/updatestate")
+    @ApiOperation(value = "修改用户的状态")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query",name = "userId",value = "用户的id",required = true,dataType = "int"),
+            @ApiImplicitParam(paramType = "query",name = "stateId",value = "状态的id",required = true,dataType = "int"),
+            @ApiImplicitParam(paramType = "query",name = "starttime",value = "状态的开始时间",required = true,dataType = "Timestamp")
+    })
+    public JsonResult updateState(Integer userId, Integer stateId, Timestamp starttime){
+        Boolean updateState = zpuserService.updateState(userId, stateId,starttime);
+        if (updateState==true){
+            return new JsonResult(200,"修改成功");
+        }
+        return new JsonResult(1002,"修改失败");
+    }
+
+    @GetMapping("/zp/fant/countfant")
+    @ApiOperation(value = "统计粉丝的数量")
+    @ApiImplicitParam(paramType = "query",name = "userId",value = "用户的id",required = true,dataType = "int")
+    public JsonResult countFants(Integer id){
+        Integer countFants = zpuserService.countFants(id);
+        return new JsonResult(200,"success",countFants);
+    }
+
+    //////////////////////////////////////////////////// -- 尤翔龙 -- //////////////////////////////////////////////
+
+    /**
+     * 关注用户
+     * @param userId:用户ID
+     * @param followUserId：想关注的用户ID
+     * @return
+     */
+    @PostMapping("/user/fol")
+    @ApiOperation(tags = "尤翔龙",value = "关注用户")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query",name = "usreId",value = "用户id",required = true,dataType = "int"),
+            @ApiImplicitParam(paramType = "query",name = "followUserId",value = "想关注用户的id",required = true,dataType = "int")
+    })
+    public JsonResult followUser(@RequestParam(value = "userId") Integer userId,@RequestParam(value = "followUserId") Integer followUserId){
+        return zpuserService.followUser(userId,followUserId);
+    }
+
+    /**
+     * 取消关注用户
+     * @param userId：用户ID
+     * @param followUserId：取消关注的用户ID
+     * @return
+     */
+    @DeleteMapping("/user/notFol")
+    @ApiOperation(tags = "尤翔龙",value = "取消关注用户")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query",name = "usreId",value = "用户id",required = true,dataType = "int"),
+            @ApiImplicitParam(paramType = "query",name = "followUserId",value = "被关注用户的id",required = true,dataType = "int")
+    })
+    public JsonResult notFollowUser(@RequestParam(value = "userId") Integer userId,@RequestParam(value = "followUserId") Integer followUserId){
+        return zpuserService.notFollowUser(userId,followUserId);
+    }
+
+    /**
+     * 判断是否已关注
+     * @author 尤翔龙
+     * @param userId
+     * @param followUserId
+     * @return
+     */
+    @GetMapping("/user/isFol")
+    @ApiOperation(tags = "尤翔龙",value = "判断是否已关注")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query",name = "usreId",value = "用户id",required = true,dataType = "int"),
+            @ApiImplicitParam(paramType = "query",name = "followUserId",value = "被关注用户的id",required = true,dataType = "int")
+    })
+    public JsonResult isFollow(@RequestParam(value = "userId") Integer userId,@RequestParam(value = "followUserId") Integer followUserId){
+        return zpuserService.isFollow(userId,followUserId);
+    }
+}

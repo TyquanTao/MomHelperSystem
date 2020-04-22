@@ -1,0 +1,35 @@
+package com.cn.dao;
+
+import com.cn.pojo.Question;
+
+import java.util.List;
+
+/**
+ * @author Tyquan
+ * @date 2019/11/28 10:08
+ */
+public interface QuestionMapper {
+
+    /**
+     * 提交问题（新建问题）
+     *
+     * @param question 新增问题的内容
+     * @return 受影响的行数
+     */
+    Integer addQuestion(Question question);
+
+    /**
+     *通过问题id查看问题详情以及该问题的所有回答
+     *
+     * @param questionId
+     * @return
+     */
+    Question findQuestionById(Integer questionId);
+
+    /**
+     * 热门搜索（点赞数加收藏数排序）
+     *
+     * @return
+     */
+    List<Question> findAllByHot();
+}

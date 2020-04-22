@@ -1,0 +1,18 @@
+package com.cn.service.impl;
+
+import com.cn.dao.PostMapper;
+import com.cn.service.PostSerivce;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class PostSerivceImpl implements PostSerivce {
+
+    @Autowired
+    private PostMapper postMapper;
+
+    @Override
+    public Boolean deleteByPostId(Integer postId) {
+        return null;
+    }
+}

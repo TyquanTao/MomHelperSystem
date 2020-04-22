@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cn.dao.AnswerMapper">
+    <resultMap id="answerMap" type="Answer">
+        <id property="answerId" column="answer_id"/>
+        <result property="questionId" column="question_id"/>
+        <result property="answerContent" column="answer_content"/>
+        <result property="answerTime" column="answer_time"/>
+        <result property="userId" column="user_id"/>
+        <result property="answerPoints" column="answer_points"/>
+        <result property="praiseState" column="praise_state"/>
+        <association property="user" column="user_id" javaType="User">
+            <id property="userId" column="user_id"/>
+            <result property="userName" column="user_name"/>
+            <result property="userPhone" column="user_phone"/>
+            <result property="userImgUrl" column="user_img_url"/>
+            <result property="userCollectCount" column="user_collect_count"/>
+            <result property="userPostCount" column="user_post_count"/>
+        </association>
+        <!--查看谁给这个回答点了赞-->
+        <collection property="answerFabulousList" ofType="AnswerFabulous" column="answer_id"
+                    select="com.cn.dao.AnswerFabulousMapper.findUserByAnswerId"/>
+    </resultMap>
+    <!--取消点赞，删除对应的那一条数据-->
+    <delete id="delAnswerFabulous">
+        delete from answer_fabulous where answer_fabulous_id=#{answerId} and user_id=#{userId}
+    </delete>
+    <!--通过问题id查询answer-->
+    <select id="findAnswerByQuestionId" resultMap="answerMap">
+        select * from
+        answer a left join user u on a.user_id = u.user_id
+        where question_id = #{questionId} and answer_del = 0
+    </select>
+    <!--回答问题-->
+    <insert id="addAnswer" parameterType="Answer">
+        insert into answer(question_id, answer_content, user_id, answer_time)
+        values (#{questionId},#{answerContent},#{userId},#{answerTime})
+    </insert>
+    <!--查看是否已经点赞-->
+    <select id="selectByAnswerFabulous" resultType="com.cn.pojo.AnswerFabulous">
+        select  * from answer_fabulous
+        where user_id = #{userId} and answer_fabulous_id = #{answerFabulousId}
+    </select>
+    <!--添加一条点赞记录-->
+    <insert id="addAnswerFabulous" parameterType="AnswerFabulous">
+        insert into answer_fabulous(user_id, answer_fabulous_id) VALUES (#{userId},#{answerFabulousId})
+    </insert>
+    <!--更新回答表的点赞次数-->
+    <update id="updateAnswerPoints">
+        update answer set answer_points = answer_points + 1
+        where answer_id = #{answerId}
+    </update>
+    <update id="updateQuestionReply" parameterType="Answer">
+        update question set question_reply = question_reply + 1
+        where question_id = #{questionId}
+    </update>
+</mapper>

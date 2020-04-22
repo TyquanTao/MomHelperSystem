@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cn.dao.SearchMapper">
+
+    <!--添加-->
+    <insert id="addSearch">
+        insert into search(user_id,search_message) values(#{userId},#{searchMessage})
+    </insert>
+
+    <!--查询用户所有搜索记录-->
+    <select id="findByUserId" resultType="String">
+        select search_message from search where user_id = #{userId} group by search_message order by Max(search_id) desc
+    </select>
+</mapper>

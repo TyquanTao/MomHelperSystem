@@ -1,0 +1,292 @@
+package com.cn.service.impl;
+
+import com.cn.config.SystemConfig;
+import com.cn.dao.BannerMapper;
+import com.cn.dto.JsonResult;
+import com.cn.pojo.Banner;
+import com.cn.pojo.vo.BannerVo;
+import com.cn.service.BannerService;
+import com.cn.utils.FileUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
+/**
+ * @author lj
+ * @date 2019/11/30 19:46
+ */
+@Service
+@Transactional(rollbackFor = Throwable.class)
+public class BannserServiceImpl implements BannerService {
+
+    ///////////////////////////////////////////////李静的代码！勿动！管理员管理Banner///////////////////////////////////////
+
+    @Autowired
+    private SystemConfig sysc;
+
+    @Autowired
+    private BannerMapper bannerMapper;
+
+    /**
+     * 根据BannerType查找Banner
+     *
+     * @param bannerType : Banner类型
+     * @return ：Banner
+     */
+    public JsonResult findBannerByBannerType(Integer bannerType) {
+        // 0. 验证数据的正确性 bannerType 不等于 0 1 2
+        if (bannerType < 0 || bannerType > 2) {
+            return new JsonResult(203, "Banner类型值错误");
+        }
+
+        // 1. 查找数据库数据
+        List<Banner> banners = bannerMapper.bannerList(bannerType);
+
+        // 2. 验证从数据库中获取的数据是否有值
+        if (banners.size() == 0) {
+            return new JsonResult(204, "请求已处理，数据库中无数据");
+        }
+
+        return new JsonResult(200, "获取数据成功！", banners);
+
+    }
+
+    /**
+     * 根据Banner类型和BannerId查找具体的Banner
+     *
+     * @param bannerType ： Banner类型
+     * @param bannerId   ： BannerId
+     * @return
+     */
+    public JsonResult findBannerById(Integer bannerType, Integer bannerId) {
+        // 0. 验证数据的正确性
+        if (bannerType < 0 || bannerType > 2) {
+            return new JsonResult(203, "Banner类型值错误");
+        }
+
+        // 1. 根据对应的bannerType进行查询
+        BannerVo bannerVo;
+        switch (bannerType) {
+            case 0:
+                bannerVo = bannerMapper.findBUByBannerId(bannerId);
+                break;
+            case 1:
+                bannerVo = bannerMapper.findBUByBannerId(bannerId);
+                break;
+            case 2:
+                bannerVo = bannerMapper.findBQByBannerId(bannerId);
+                break;
+            default:
+                bannerVo = null;
+                break;
+        }
+
+        // 2. 验证返回结果
+        if (bannerVo == null) {
+            // 查无数据
+            return new JsonResult(204,"请求已处理，但无数据返回");
+        }
+        // 3. 返回成功！！
+        return new JsonResult(200,"请求成功",bannerVo);
+    }
+
+    /**
+     * 添加问答Banner的内容
+     *
+     * @param bannerType ：Banner类型
+     * @param bannerName ： Banner名字
+     * @param questionId ： 问答的Id
+     * @param file       ： Banner的图片
+     * @return
+     */
+    @Override
+    public JsonResult addQuestionBanner(Integer bannerType, String bannerName, Integer questionId, MultipartFile file) {
+        // 0. 验证参数的有效性 bannerType == null一般不存在这种情况
+        if (bannerName.equals("") || bannerName == null || questionId == 0 || file.isEmpty()) {
+            return new JsonResult(208, "数据有误！！");
+        }
+
+        // 1. 将图片文件保存至文件服务器，返回存放地址
+        // 1.1 获取文件名称
+        String fileName = file.getOriginalFilename();
+        // 1.2 解析文件后缀
+        String suffix = FileUtil.getSuffix(fileName);
+        if (suffix == null) {
+            return new JsonResult(209, "请上传正确的文件");
+        }
+        // 判断后缀的合法性
+        if (!suffix.contains(sysc.getSuffixs())) {
+            return new JsonResult(210, "文件类型不支持！");
+        }
+
+        // 获取唯一文件名
+        String fname = FileUtil.getFileName();
+        // 获取文件的保存路径
+        String filePath = "banner/" + FileUtil.getDataFilePath();
+        // 获取文件数据库的路径
+        String basePath = sysc.getBasePath();
+        // 创建上传的路径
+        if (!FileUtil.createDirs(filePath)) {
+            return new JsonResult(211, "文件上传路径创建失败！");
+        }
+        // 准备File的抽象对象并保存图片的上传url ----> 3
+        String imgUrl = basePath + filePath + fname + suffix;
+        File fileObject = new File(imgUrl);
+        // 上传文件
+        try {
+            file.transferTo(fileObject);
+            // 2. 保存Banner对象，调用BannerMapper
+            Integer bannerId = bannerMapper.saveBanner(new Banner(bannerName, bannerType));
+            // 存入失败！
+            if (bannerId == 0) {
+                return new JsonResult(212, "保存Banner对象出错！");
+            }
+            // 3. 向关系表中添加数据
+            // 3.1 失败 ----> 存入失败 ----> 一般不可能，上面已验证数据
+            if (bannerMapper.saveBQImg(questionId, bannerId, imgUrl) == 0) {
+                return new JsonResult(213, "保存问答Banner关联关系出错");
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        // 3.2 成功！！
+        return new JsonResult(200, "保存成功！");
+    }
+
+
+    /**
+     * 添加主页Banner的内容
+     *
+     * @param bannerType ：Banner类型
+     * @param bannerName ： Banner名字
+     * @param postId     ： 热门帖子的Id
+     * @param file       ： Banner的图片
+     * @return
+     */
+    @Override
+    public JsonResult addUserBanner(Integer bannerType, String bannerName, Integer postId, MultipartFile file) {
+        // 0. 验证参数的有效性 bannerType == null一般不存在这种情况
+        if (bannerName.equals("") || bannerName == null || postId == 0 || file.isEmpty()) {
+            return new JsonResult(208, "数据有误！！");
+        }
+
+        // 1. 将图片文件保存至文件服务器，返回存放地址
+        // 1.1 获取文件名称
+        String fileName = file.getOriginalFilename();
+        // 1.2 解析文件后缀
+        String suffix = FileUtil.getSuffix(fileName);
+        if (suffix == null) {
+            return new JsonResult(209, "请上传正确的文件");
+        }
+        // 判断后缀的合法性
+        if (!suffix.contains(sysc.getSuffixs())) {
+            return new JsonResult(210, "文件类型不支持！");
+        }
+
+        // 获取唯一文件名
+        String fname = FileUtil.getFileName();
+        // 获取文件的保存路径
+        String filePath = "banner/" + FileUtil.getDataFilePath();
+        // 获取文件数据库的路径
+        String basePath = sysc.getBasePath();
+        // 创建上传的路径
+        if (!FileUtil.createDirs(filePath)) {
+            return new JsonResult(211, "文件上传路径创建失败！");
+        }
+        // 准备File的抽象对象并保存图片的上传url ----> 3
+        String imgUrl = basePath + filePath + fname + suffix;
+        File fileObject = new File(imgUrl);
+        // 上传文件
+        try {
+            file.transferTo(fileObject);
+            // 2. 保存Banner对象，调用BannerMapper
+            Integer bannerId = bannerMapper.saveBanner(new Banner(bannerName, bannerType));
+            // 存入失败！
+            if (bannerId == 0) {
+                return new JsonResult(212, "保存Banner对象出错！");
+            }
+            // 3. 向关系表中添加数据
+            // 3.1 失败 ----> 存入失败 ----> 一般不可能，上面已验证数据
+            if (bannerMapper.saveBUImg(postId, bannerId, imgUrl) == 0) {
+                return new JsonResult(213, "保存问答Banner关联关系出错");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        // 3.2 成功！！
+        return new JsonResult(200, "保存成功！");
+    }
+
+    //addCircleBanner
+
+    /**
+     * 添加圈子Banner的内容
+     *
+     * @param bannerType ：Banner类型
+     * @param bannerName ： Banner名字
+     * @param file       ： Banner的图片
+     * @return
+     */
+    @Override
+    public JsonResult addCircleBanner(Integer bannerType, String bannerName, MultipartFile file) {
+        // 0. 验证参数的有效性 bannerType == null一般不存在这种情况
+        if (bannerName.equals("") || bannerName == null || file.isEmpty()) {
+            return new JsonResult(208, "数据有误！！");
+        }
+
+        // 1. 将图片文件保存至文件服务器，返回存放地址
+        // 1.1 获取文件名称
+        String fileName = file.getOriginalFilename();
+        // 1.2 解析文件后缀
+        String suffix = FileUtil.getSuffix(fileName);
+        if (suffix == null) {
+            return new JsonResult(209, "请上传正确的文件");
+        }
+        // 判断后缀的合法性
+        if (!suffix.contains(sysc.getSuffixs())) {
+            return new JsonResult(210, "文件类型不支持！");
+        }
+
+        // 获取唯一文件名
+        String fname = FileUtil.getFileName();
+        // 获取文件的保存路径
+        String filePath = "banner/" + FileUtil.getDataFilePath();
+        // 获取文件数据库的路径
+        String basePath = sysc.getBasePath();
+        // 创建上传的路径
+        if (!FileUtil.createDirs(filePath)) {
+            return new JsonResult(211, "文件上传路径创建失败！");
+        }
+        // 准备File的抽象对象并保存图片的上传url ----> 3
+        String imgUrl = basePath + filePath + fname + suffix;
+        File fileObject = new File(imgUrl);
+        // 上传文件
+        try {
+            file.transferTo(fileObject);
+            // 2. 保存Banner对象，调用BannerMapper
+            Integer bannerId = bannerMapper.saveBanner(new Banner(bannerName, bannerType));
+            // 存入失败！
+            if (bannerId == 0) {
+                return new JsonResult(212, "保存Banner对象出错！");
+            }
+            // 3. 向关系表中添加数据
+            // 3.1 失败 ----> 存入失败 ----> 一般不可能，上面已验证数据
+            if (bannerMapper.saveBCImg(bannerId, imgUrl) == 0) {
+                return new JsonResult(213, "保存问答Banner关联关系出错");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        // 3.2 成功！！
+        return new JsonResult(200, "保存成功！");
+    }
+
+
+    ////////////////////////////////////////////////////////李静的///////////////////////////////////////////////////////
+}

@@ -1,0 +1,147 @@
+package com.cn.utils;
+
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.util.Date;
+
+/**
+ * 和Jwt操作相关的方法
+ *
+ * @author:Teacher黄
+ * @date:Created at 2019/11/25
+ */
+public class JwtUtil {
+
+    /**
+     * 密钥
+     */
+    private static final String SECRET = "sdfasdfasdfdsfasdf";
+
+    /**
+     * 发行人
+     * issuer
+     */
+    private static final String ISSUER = "java201第三组";
+
+    /**
+     * 存放用户id的key
+     */
+    private static final String USERID = "userId";
+
+    /**
+     * 存放用户自定义信息的key : 存放登陆成功的用户对象
+     */
+    private static final String DATA = "data";
+
+    /**
+     * 生存时间
+     */
+    private static final Long EXPIRE_TIME = 3600 * 1000L;
+
+
+    /**
+     * 生成token
+     *
+     * @param data   : 存放的用户数据
+     * @param userId : 存放的用户id
+     * @param <T>    : 数据类型
+     * @return
+     */
+    public static <T> String sign(T data, Integer userId) {
+
+        try {
+            // 指定加密算法
+            Algorithm algorithm = Algorithm.HMAC256(SECRET);
+            // 计算过期时间
+            Date expire = new Date(System.currentTimeMillis() + EXPIRE_TIME);
+            // 将用户对象转换成json字符串
+            ObjectMapper objectMapper = new ObjectMapper();
+            String jsonData = objectMapper.writeValueAsString(data);
+            // 生成token
+            return JWT.create()
+                    .withClaim(USERID, userId)
+                    .withClaim(DATA, jsonData)
+                    .withExpiresAt(expire)
+                    .withIssuer(ISSUER)
+                    .sign(algorithm);
+
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+    /**
+     * 验证token的正确性
+     *
+     * @param token  : jwt token
+     * @param userId : 存放的用户id
+     * @return
+     */
+    public static Boolean verify(String token, Integer userId) {
+        try {
+            // 指定加密算法
+            Algorithm algorithm = Algorithm.HMAC256(SECRET);
+            // 验证器
+            JWTVerifier verifier = JWT.require(algorithm)
+                    .withClaim(USERID, userId)
+                    .withIssuer(ISSUER)
+                    .build();
+            // 验证
+            verifier.verify(token);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+    /**
+     * 获取保存的用户id
+     *
+     * @param token
+     * @return
+     */
+    public static Integer getUserId(String token) {
+        try {
+            // 解码token
+            DecodedJWT decode = JWT.decode(token);
+            return decode.getClaim(USERID).asInt();
+        } catch (JWTDecodeException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+    /**
+     * 获取用户保存的信息
+     *
+     * @param token  : jwt token
+     * @param tClass : 存放数据的class对象
+     * @param <T>    : 类型
+     * @return
+     */
+    public static <T> T getData(String token, Class<T> tClass) {
+        try {
+            // 解码token
+            DecodedJWT decode = JWT.decode(token);
+            // 存放的用户数据的json字符串
+            String jsonData = decode.getClaim(DATA).asString();
+            // 利用jackson将json转换成对象
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.readValue(jsonData, tClass);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+}

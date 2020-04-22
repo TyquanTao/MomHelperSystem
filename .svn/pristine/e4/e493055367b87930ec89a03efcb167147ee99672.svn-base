@@ -1,0 +1,128 @@
+package com.cn.dao;
+
+import com.cn.pojo.Banner;
+import com.cn.pojo.vo.BannerVo;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
+/**
+ * 轮播图的Mapper
+ * @author lj
+ * @date 2019/11/30 20:11
+ */
+public interface BannerMapper {
+    //////////////////////////////////////////////////陶仟
+    
+
+    //////////////////////////////////////李静的Banner管理////////////////////////////////////////////////////////////////
+
+    /**
+     * 保存Banner对象
+     * @param banner
+     * @return : banner的主键 --> id
+     */
+    public Integer saveBanner(Banner banner);
+
+    /**
+     * 根据BannerType展示Banner的List
+     * @param bannerType ：Banner的类型 0 圈子 1 主页 2 问答
+     * @return : Banner的List对象
+     */
+    public List<Banner> bannerList(@Param("bannerType") Integer bannerType);
+
+    /**
+     * 根据BannerId查找问答Banner的详细信息
+     * @param bannerId : BannerId
+     * @return ： Banner的包装类
+     */
+    public BannerVo findBQByBannerId(@Param("bannerId") Integer bannerId);
+
+    /**
+     * 根据BannerId查找主页Banner的详细信息
+     * @param bannerId : BannerId
+     * @return ： Banner的包装类
+     */
+    public BannerVo findBUByBannerId(@Param("bannerId") Integer bannerId);
+
+    /**
+     * 根据BannerId查找圈子Banner的详细信息
+     * @param bannerId : BannerId
+     * @return ： Banner的包装类
+     */
+    public BannerVo findBCByBannerId(@Param("bannerId") Integer bannerId);
+
+    /**
+     * 将问答的轮播图存入数据库中
+     * @param bannerId ：Banner的id
+     * @param questionId ：Banner关联的问答id
+     * @param imgUrl ：图片的存放地址
+     * @return : 影响的行数
+     */
+    public Integer saveBQImg(@Param("bannerId") Integer bannerId,
+                             @Param("questionId") Integer questionId ,
+                             @Param("imgUrl") String imgUrl);
+
+    /**
+     * 将主页中的轮播图存入数据库中
+     * @param bannerId ：Banner的id
+     * @param postId ：Banner关联的帖子id
+     * @param imgUrl ：图片的存放地址
+     * @return : 影响的行数
+     */
+    public Integer saveBUImg(@Param("bannerId") Integer bannerId,
+                             @Param("postId") Integer postId ,
+                             @Param("imgUrl") String imgUrl);
+
+    /**
+     * 将圈子中的轮播图存入数据库中
+     * @param bannerId ：Banner的id
+     * @param imgUrl ：图片的存放地址
+     * @return : 影响的行数
+     */
+    public Integer saveBCImg(@Param("bannerId") Integer bannerId,
+                             @Param("imgUrl") String imgUrl);
+
+
+    /**
+     * 根据BannerId删除Banner
+     * @param bannerId ：Banner的id
+     * @return
+     */
+    public Integer delBannerById(@Param("bannerId") Integer bannerId);
+
+    /**
+     * 根据BannerId修改Banner的name
+     * @param bannerId
+     * @param bannerName
+     * @return
+     */
+    public Integer updateBannerById(@Param("bannerId") Integer bannerId,@Param("bannerName") String bannerName);
+
+    /**
+     *  修改社区Banner的相关(图片，文章)
+     * @param bannerId
+     * @param imgUrl
+     * @param postId
+     * @return
+     */
+    public Integer updateBUBanner(@Param("bannerId") Integer bannerId,@Param("imgUrl") String imgUrl, @Param("postId") Integer postId);
+
+    /**
+     *  修改问答Banner的相关(图片，文章)
+     * @param bannerId
+     * @param imgUrl
+     * @param questionId
+     * @return
+     */
+    public Integer updateBQBanner(@Param("bannerId") Integer bannerId,@Param("imgUrl") String imgUrl, @Param("questionId") Integer questionId);
+
+    /**
+     *  修改圈子Banner的图片
+     * @param bannerId
+     * @param imgUrl
+     * @return
+     */
+    public Integer updateBCBanner(@Param("bannerId") Integer bannerId,@Param("imgUrl") String imgUrl);
+    //////////////////////////////////////////////李静的Banner管理///////////////////////////////////////////////////////
+}

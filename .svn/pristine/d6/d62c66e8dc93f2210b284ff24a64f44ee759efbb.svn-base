@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cn.dao.SearchMapper">
+
+    <!--添加-->
+    <insert id="addSearch">
+        insert into search(user_id,search_message) values(#{userId},#{searchMessage})
+</insert>
+
+    <insert id="addSearchForQuestion">
+        insert into search(user_id,search_message,search_type) values(#{userId},#{searchMessage},2)
+    </insert>
+
+    <!--删除单个历史记录-->
+    <update id="deleteHistoryBySearchId">
+          update search set search_del = 1 where search_message = #{searchMessage} and user_id = #{userId}
+    </update>
+
+    <!--删除全部历史记录-->
+    <update id="deleteAllHistory">
+        update search set search_del = 1 where user_id = #{userId}
+    </update>
+
+    <!--查询用户所有搜索记录-->
+    <select id="findByUserId" resultType="String">
+        select search_message from search
+        where user_id = #{userId} and search_del = 0
+        group by search_message order by Max(search_id) desc
+    </select>
+
+    <!--查询搜索榜前10-->
+    <select id="findTop10HistorySearchMessage" resultType="java.lang.String">
+        select search_message from search
+        group by search_message
+        order by count(search_message) desc
+        limit 10
+
+    </select>
+</mapper>

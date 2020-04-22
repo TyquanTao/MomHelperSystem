@@ -1,0 +1,37 @@
+package com.cn.dao;
+
+import com.cn.pojo.Circle;
+
+import java.util.List;
+
+public interface CircleMapper {
+    /**
+     * 圈子小类列表
+     * @from:罗世杰
+     * @return
+     */
+    List<Circle> findAllCircle();
+
+    /**
+     * 根据圈子大类ID查询圈子小类列表
+     * @from
+     * @return
+     */
+    List<Circle> findById(Integer categoryId);
+
+    /**
+     * 根据小圈子ID查询小圈子
+     * @from：罗世杰
+     * @param circle_id
+     * @return
+     */
+    Circle findByCirclrId(Integer circle_id);
+
+    /**
+     * 通过圈子ID查询圈子名称
+     * @author 尤翔龙
+     * @param circle_id
+     * @return
+     */
+    Circle findNameById(Integer circle_id);
+}

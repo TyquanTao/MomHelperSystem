@@ -1,0 +1,122 @@
+package com.cn.web.controller;
+
+import com.cn.dto.JsonResult;
+import com.cn.pojo.Message;
+import com.cn.pojo.vo.PostVo;
+import com.cn.service.MessageService;
+import io.swagger.annotations.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+
+@Controller
+@RestController
+@Api(tags = "周鑫-消息管理", value = "")
+public class MessageController {
+    @Autowired
+    private MessageService messageService;
+    /**
+     *后台创建系统消息
+     * 周鑫
+     * @param messageEntity 消息信息
+     * @return
+     */
+    @PostMapping("/posterior/message/creatMessage")
+    @ResponseBody
+    @ApiOperation(value = "后台创建系统消息", notes = "通过json注入数据")
+    @ApiImplicitParam(paramType = "body", name = "messageEntity", value = "消息信息实体", required = true, dataType = "Message")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "发送成功"),
+            @ApiResponse(code = 2041, message = "消息创建失败"),
+            @ApiResponse(code = 2042, message = "消息创建成功，发送失败"),
+            @ApiResponse(code = 400, message = "请求数据错误", response = Exception.class)
+    })
+    public JsonResult creatMessage(@RequestBody Message messageEntity) {
+        Integer userId = 1000;
+
+        return messageService.creatMessage(userId,messageEntity);
+    }
+
+    /**
+     * 用户创建私信消息
+     * 周鑫
+     * @param userId 当前用户Id
+     * @param messageEntity 消息信息
+     * @return
+     */
+    @PostMapping("/user/message/creatMessage")
+    @ResponseBody
+    @ApiOperation(value = "用户创建私信消息", notes = "通过json注入数据")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "userId", value = "当前用户Id", required = true, dataType = "Integer"),
+            @ApiImplicitParam(paramType = "body", name = "messageEntity", value = "消息信息实体", required = true, dataType = "Message")
+    })
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "发送成功"),
+            @ApiResponse(code = 2041, message = "消息创建失败"),
+            @ApiResponse(code = 2042, message = "消息创建成功，发送失败"),
+            @ApiResponse(code = 400, message = "请求数据错误", response = Exception.class)
+    })
+    public JsonResult creatMessageByUser(@RequestParam Integer userId, @RequestBody Message messageEntity) {
+        return messageService.creatMessage(userId,messageEntity);
+    }
+
+    /**
+     * 用户获取自己接收的消息列表
+     * 周鑫
+     * @param  userId 当前用户Id
+     * @return
+     */
+    @GetMapping("/user/message/getMessages")
+    @ResponseBody
+    @ApiOperation(value = " 用户获取自己接收的消息列表")
+    @ApiImplicitParam(paramType = "query", name = "userId", value = "当前用户Id", required = true, dataType = "Integer")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "查询成功"),
+            @ApiResponse(code = 204, message = "查询成功，无对应数据"),
+            @ApiResponse(code = 400, message = "请求参数错误", response = Exception.class)
+    })
+    public JsonResult getMessagesByUser(@RequestParam Integer userId) {
+        return messageService.cheackMessageByRecipient(userId);
+    }
+
+    /**
+     * 用户删除消自己接收的消息
+     * 周鑫
+     * @param  messageId  用户-消息关系Id
+     * @return
+     */
+    @PostMapping("/user/message/removeMessage")
+    @ResponseBody
+    @ApiOperation(value = "用户删除消自己接收的消息")
+    @ApiImplicitParam(paramType = "query", name = "messageId", value = "消息Id", required = true, dataType = "Integer")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "删除成功"),
+            @ApiResponse(code = 204, message = "删除失败"),
+            @ApiResponse(code = 400, message = "请求参数错误", response = Exception.class)
+    })
+    public JsonResult removeMessageByUser(@RequestParam Integer messageId) {
+        return messageService.removeMessage(messageId);
+    }
+
+    /**
+     * 用户点击消息阅读后消息状态改变
+     * 周鑫
+     * @param  messageId 用户-消息关系Id
+     * @return
+     */
+    @PostMapping("/user/message/setMessageIsRead")
+    @ResponseBody
+    @ApiOperation(value = "用户点击消息阅读后消息状态改变")
+    @ApiImplicitParam(paramType = "query", name = "messageId", value = "消息ID", required = true, dataType="Integer")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "状态修改成功"),
+            @ApiResponse(code = 204, message = "状态修改失败"),
+            @ApiResponse(code = 400, message = "请求参数错误", response = Exception.class)
+    })
+    public JsonResult setMessageIsReadByUser(@RequestParam Integer messageId) {
+        return messageService.updateMessageState(messageId);
+    }
+}

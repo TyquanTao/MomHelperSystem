@@ -1,0 +1,40 @@
+package com.cn.service.impl;
+
+import com.cn.dao.CommentMapper;
+import com.cn.dto.JsonResult;
+import com.cn.pojo.Comment;
+import com.cn.service.CommentService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.sql.Timestamp;
+
+@Service
+@Transactional(rollbackFor = Throwable.class)
+public class CommentServiceImpl implements CommentService {
+
+    @Autowired
+    private CommentMapper commentMapper;
+
+    /**
+     * 添加评论
+     * @author 尤翔龙
+     * @param comment
+     * @return
+     */
+    @Override
+    public JsonResult<Comment> addComment(Comment comment) {
+        if (comment==null) {
+           return new JsonResult<>(4001,"参数不能为空");
+        }else{
+            Timestamp time = new Timestamp(System.currentTimeMillis());
+            comment.setCommentTime(time);
+            Integer nums = commentMapper.addComment(comment);
+            if (nums>0) {
+                return new JsonResult<>(200,"评论成功");
+            }
+        }
+        return new JsonResult<>(200,"评论失败");
+    }
+}

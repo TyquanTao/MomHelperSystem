@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.cn.dao.QuestionMapper">
+    <!--新增问题/提交问题-->
+    <insert id="addQuestion" parameterType="question">
+        insert into question(question_title,question_content,user_id,question_time)
+        VALUES (#{questionTitle},#{questionContent},#{userId},#{questionTime})
+    </insert>
+    <!--删除历史记录-->
+    <update id="delHistorySearchByUserId">
+        update search set search_del = 1 where search_type = 2 and user_id = #{userId}
+    </update>
+    <!--问题详情map 当前问题和回答此问题的回答-->
+    <resultMap id="questionAnswerMap" type="question">
+        <id property="questionId" column="question_id"/>
+        <result property="questionTitle" column="question_title"/>
+        <result property="questionContent" column="question_content"/>
+        <result property="questionTime" column="question_time"/>
+        <result property="questionPoints" column="question_points"/>
+        <result property="questionCollections" column="question_collections"/>
+        <result property="questionReply" column="question_reply"/>
+        <result property="praiseState" column="praise_state"/>
+        <result property="collectState" column="collect_state"/>
+        <result property="userId" column="user_id"/>
+        <association property="user" column="user_id" javaType="User">
+        <id property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="userPhone" column="user_phone"/>
+        <result property="userImgUrl" column="user_img_url"/>
+        <result property="userCollectCount" column="user_collect_count"/>
+        <result property="userPostCount" column="user_post_count"/>
+    </association>
+        <collection property="answers" ofType="Answer" column="question_id"
+                    select="com.cn.dao.AnswerMapper.findAnswerByQuestionId"/>
+        <collection property="questionFabulousList" ofType="QuestionFabulous" column="question_id"
+                    select="com.cn.dao.QuestionFabulousMapper.findUserIdByQuestionId"/>
+        <collection property="questionCollectionList" ofType="QuestionCollection" column="question_id"
+                    select="com.cn.dao.QuestionCollectionMapper.findUserIdByQuestionId"/>
+    </resultMap>
+    <!--通过问题id查询问题详情，并通过questionId查询出所有的回答详情-->
+    <select id="findQuestionById" resultMap="questionAnswerMap">
+        select q.question_id,q.question_title,q.question_content,q.question_time,q.question_points,q.question_collections,q.question_reply,q.collect_state,q.praise_state,u.*
+        from question q left join user u
+        on q.user_id = u.user_id
+        where question_id = #{questionId} and question_del = 0
+    </select>
+    <resultMap id="questionMap" type="question">
+        <id property="questionId" column="question_id"/>
+        <result property="questionTitle" column="question_title"/>
+        <result property="questionContent" column="question_content"/>
+        <result property="questionTime" column="question_time"/>
+        <result property="questionPoints" column="question_points"/>
+        <result property="questionCollections" column="question_collections"/>
+    </resultMap>
+    <resultMap id="map1" type="Question">
+        <id property="questionId" column="question_id"/>
+        <result property="questionTitle" column="question_title"/>
+        <result property="questionContent" column="question_content"/>
+        <result property="questionTime" column="question_time"/>
+        <result property="questionPoints" column="question_points"/>
+        <result property="questionCollections" column="question_collections"/>
+        <result property="questionReply" column="question_reply"/>
+        <result property="userId" column="user_id"/>
+        <result property="praiseState" column="praise_state"/>
+        <result property="collectState" column="collect_state"/>
+        <association property="user" column="user_id" javaType="User">
+            <id property="userId" column="user_id"/>
+            <result property="userName" column="user_name"/>
+            <result property="userPhone" column="user_phone"/>
+            <result property="userImgUrl" column="user_img_url"/>
+            <result property="userCollectCount" column="user_collect_count"/>
+            <result property="userPostCount" column="user_post_count"/>
+        </association>
+        <collection property="questionFabulousList" ofType="QuestionFabulous" column="question_id"
+                    select="com.cn.dao.QuestionFabulousMapper.findUserIdByQuestionId"/>
+        <collection property="questionCollectionList" ofType="QuestionCollection" column="question_id"
+                    select="com.cn.dao.QuestionCollectionMapper.findUserIdByQuestionId"/>
+    </resultMap>
+    <!--通过热度降序查询所有问题-->
+    <select id="findAllByHot" resultMap="map1" resultType="Question">
+        SELECT q.*,u.*
+        from question q left join user u
+        on u.user_id =q.user_id
+        where q.question_del = 0 and u.user_del=0 and q.is_hot>40
+        ORDER BY q.is_hot DESC
+    </select>
+    <!--未解决问题-->
+    <select id="findAllByUnsolvedQuestion" resultMap="map1" resultType="Question">
+        SELECT q.*,u.*
+        from question q left join user u
+        on u.user_id =q.user_id
+        where q.question_del = 0 and u.user_del=0 and q.is_hot &lt;40
+        ORDER BY q.is_hot
+    </select>
+    <!--通过问题标题查询问题（模糊查询）-->
+    <select id="findQuestionLikeTitle" resultMap="map1" resultType="Question">
+        select *
+        from question q left JOIN user u
+        on u.user_id = q.user_id
+        where question_del = 0
+        and question_title like concat('%',#{questionTitle},'%')
+    </select>
+    <!--查询历史搜索，通过用户id查询-->
+    <select id="findHistorySearch" resultType="java.lang.String">
+        select distinct search_message from search
+        WHERE search_del =0 and search_type =2 and user_id =#{userId}
+        ORDER BY search_id desc
+    </select>
+    <!--查询热门搜索-->
+    <select id="findHotSearch" resultType="java.lang.String">
+        select search_message
+        from search WHERE search_type =2 and search_del =0
+        GROUP BY search_message ORDER BY count(*) desc
+    </select>
+    <!--收藏问题，操作问题收藏表-->
+    <insert id="addCollectQuestion">
+        insert into question_collection(user_id,question_collection_id)
+        values (#{userId},#{questionId})
+    </insert>
+    <!--更新收藏次数，操作问题表-->
+    <update id="updateQuestionCollections">
+        update question set question_collections = question_collections +1
+        where question_id = #{questionId}
+    </update>
+    <!--查询用户是否已经收藏此问题-->
+    <select id="selectQuestionCollection" resultType="com.cn.pojo.QuestionCollection">
+        select * from question_collection where user_id = #{userId} and question_collection_id = #{questionId}
+    </select>
+    <!--查看是否已经点赞-->
+    <select id="selectByQuestionFabulous" resultType="com.cn.pojo.QuestionFabulous">
+        select  * from question_fabulous
+        where user_id = #{userId} and question_fabulous_id = #{questionFabulousId}
+    </select>
+    <!--查询问题id-->
+    <select id="selectQuestionId" resultType="java.lang.Integer" parameterType="Question">
+        select question_id
+        from question
+        where question_title = #{questionTitle} and question_content = #{questionContent} and user_id = #{userId}
+    </select>
+    <!--记数 正在提问的人数，去掉重复在未解决的问题中查-->
+    <select id="countUserForQuestion" resultType="java.lang.Integer">
+        select count(DISTINCT user_id)
+        from question where is_hot &lt;40
+    </select>
+
+    <!--添加一条问题点赞记录-->
+    <insert id="addQuestionFabulous">
+        insert into question_fabulous(user_id, question_fabulous_id) VALUES (#{userId},#{questionFabulousId})
+    </insert>
+    <!--更新问题表的点赞次数-->
+    <update id="updateQuestionPoints">
+        update question set question_points = question_points+1
+        where question_id =#{questionId}
+    </update>
+    <!--取消点赞-->
+    <delete id="delQuestionFabulous" parameterType="QuestionFabulous">
+        delete from question_fabulous where user_id =#{userId} and question_fabulous_id = #{questionFabulousId}
+    </delete>
+    <!--取消收藏问题，删除收藏数据-->
+    <delete id="delCollectQuestion">
+        delete from question_collection where user_id=#{userId} and question_collection_id = #{questionId}
+    </delete>
+</mapper>

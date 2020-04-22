@@ -1,0 +1,36 @@
+package com.cn.pojo;
+
+
+import java.io.Serializable;
+
+public class State implements Serializable {
+
+  private long stateId;
+  private String stateMessage;
+
+  public State() {
+  }
+
+  public State(long stateId, String stateMessage) {
+    this.stateId = stateId;
+    this.stateMessage = stateMessage;
+  }
+
+  public long getStateId() {
+    return stateId;
+  }
+
+  public void setStateId(long stateId) {
+    this.stateId = stateId;
+  }
+
+
+  public String getStateMessage() {
+    return stateMessage;
+  }
+
+  public void setStateMessage(String stateMessage) {
+    this.stateMessage = stateMessage;
+  }
+
+}

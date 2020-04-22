@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cn.dao.PostMapper">
+
+    <insert id="addPost" parameterType="Post" keyProperty="postId" useGeneratedKeys="true">
+        insert into post(post_title,post_content,post_time,circle_id,user_id) values(#{postTitle},#{postContent},#{postTime},#{circleId},#{userId})
+    </insert>
+
+
+
+    <!--收藏帖子-->
+    <insert id="collectPost">
+        insert into user_post(post_id,user_id) values(#{postId},#{userId})
+    </insert>
+
+    <!--取消收藏帖子-->
+    <delete id="notCollectPost">
+        delete from user_post where post_id=#{postId} and user_id=#{userId}
+    </delete>
+
+    <!--判断是否已收藏-->
+    <select id="isCollectPost" resultType="java.lang.Integer">
+        select * from user_post where post_id=#{postId} and user_id=#{userId}
+    </select>
+
+    <!--帖子点赞-->
+    <insert id="giveLikePost">
+        insert into post_fabulous(post_id,user_id) values(#{postId},#{userId})
+    </insert>
+
+    <!--取消帖子点赞-->
+    <delete id="notLikePost">
+        delete from post_fabulous where post_id=#{postId} and user_id=#{userId}
+    </delete>
+
+    <!--判断是否点赞-->
+    <select id="isLikePost" resultType="java.lang.Integer">
+        select * from post_fabulous where post_id=#{postId} and user_id=#{userId}
+    </select>
+
+    <!--通过帖子ID删除帖子（软删）-->
+    <update id="deleteByPostId">
+        update post set post_del=1 where post_id=#{postId}
+    </update>
+
+    <!--修改帖子内容-->
+    <update id="updatePost">
+        update post
+        <set>
+            <if test="postTitle!=null and postTitle.length()>0">post_title=#{postTitle},</if>
+            <if test="postContent!=null and postContent.length()>0">post_content=#{postContent},</if>
+            <if test="circleId!=null">circle_id=#{circleId},</if>
+        </set>
+        where post_id=#{postId}
+    </update>
+
+    <!--查询单个帖子所有内容-->
+    <select id="findByPostId" resultMap="findPostAll">
+        select p.post_id,p.post_title,p.post_content,p.post_time,p.circle_id,p.user_id,u.user_name,u.user_img_url,c.circle_name from post p
+        left join user u on p.user_id=u.user_id
+        left join circle c on p.circle_id=c.circle_id
+        where p.post_id=#{postId} and post_del=0
+    </select>
+
+    <!--查询所有帖子（热门推荐）-->
+    <select id="findAllPost" resultMap="findAllpost">
+        select p.post_id,p.post_title,p.post_content,p.user_id,u.user_name,u.user_img_url,count(pf.post_id) from post p
+        left join user u on p.user_id=u.user_id
+        left join post_fabulous pf on p.post_id=pf.post_id
+        where post_del=0 GROUP by post_id order by count(pf.post_id) desc
+    </select>
+
+    <!--通过用户ID查询关注用户ID-->
+    <select id="findFollowUserId" resultType="java.lang.Integer">
+        select follow_user_id from follow_user where user_id=#{userId}
+    </select>
+
+    <!--通过关注用户ID集合查询帖子-->
+    <select id="findPostByFollowUserId" resultMap="findAllpost">
+        select p.post_id,p.post_title,p.post_content,p.user_id,p.post_time,u.user_name,u.user_img_url from post p
+        left join user u on p.user_id=u.user_id
+        where post_del=0 and p.user_id in
+        <foreach item="followUserIds" index="index" collection="list" open="(" separator="," close=")">#{followUserIds}</foreach>
+        GROUP by post_id order by p.post_time desc
+    </select>
+
+    <!-- 帖子详情查询 -->
+    <resultMap id="findPostAll" type="PostVo">
+        <id column="post_id" property="postId"/>
+        <result column="post_title" property="postTitle"/>
+        <result column="post_content" property="postContent"/>
+        <result column="circle_id" property="circleId"/>
+        <result column="post_del" property="postDel"/>
+        <result column="post_time" property="postTime"/>
+        <result column="user_id" property="userId"/>
+
+        <!--帖子与用户一对一-->
+        <association property="user" column="user_id" javaType="User"
+                     select="com.cn.dao.UserMapper.findUserByUserId"/>
+        <!--帖子与圈子一对一-->
+        <association property="circle" column="circle_id" javaType="Circle"
+                     select="com.cn.dao.CircleMapper.findNameById"/>
+        <!--帖子回复数量统计-->
+        <association property="countComment" column="post_id" javaType="java.lang.Integer"
+                     select="countPostComment"/>
+        <!--帖子点赞数量统计-->
+        <association property="countFabulous" column="post_id" javaType="java.lang.Integer"
+                     select="countPostFabulous"/>
+        <!--帖子收藏数量统计-->
+        <association property="countCollection" column="post_id" javaType="java.lang.Integer"
+                     select="countPostCollection"/>
+        <!--帖子与帖子图片关系映射-->
+        <collection property="postImgs" column="post_id" ofType="com.cn.pojo.PostImg"
+                    select="com.cn.dao.PostImgPostMapper.findPostImgByPostId" />
+    </resultMap>
+
+    <!--所有帖子查询（热门推荐）-->
+    <resultMap id="findAllpost" type="PostVo">
+        <id column="post_id" property="postId"/>
+        <result column="post_title" property="postTitle"/>
+        <result column="post_content" property="postContent"/>
+
+        <!--帖子与用户一对一-->
+        <association property="user" column="user_id" javaType="User"
+                     select="com.cn.dao.UserMapper.findUserByUserId"/>
+        <!--帖子回复数量统计-->
+        <association property="countComment" column="post_id" javaType="java.lang.Integer"
+                     select="countPostComment"/>
+        <!--帖子点赞数量统计-->
+        <association property="countFabulous" column="post_id" javaType="java.lang.Integer"
+                     select="countPostFabulous"/>
+        <!--帖子收藏数量统计-->
+        <association property="countCollection" column="post_id" javaType="java.lang.Integer"
+                     select="countPostCollection"/>
+        <!--帖子与帖子图片关系映射-->
+        <collection property="postImgs" column="post_id" ofType="com.cn.pojo.PostImg"
+                    select="com.cn.dao.PostImgPostMapper.findPostImgByPostId"/>
+    </resultMap>
+
+    <!--/////////////////////////////////////////////////// -周鑫- ////////////////////////////////////////////////////////////////////-->
+
+    <!--恢复多个帖子-->
+    <update id="recoveryPostByIds">
+        update post set post_del=0,is_recommend=0 where post_id in
+        <foreach collection="postIds" index="index" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+
+    <!--恢复单个帖子-->
+    <update id="recoveryPostById">
+         update post set post_del=0,is_recommend=0 where post_id = #{postId}
+    </update>
+
+
+    <!--假删多个帖子-->
+    <update id="removePostByIds">
+        update post set post_del=1 where post_id in
+        <foreach collection="postIds" index="index" item="item" separator="," open="(" close=")">
+        #{item}
+        </foreach>
+    </update>
+
+    <!--假删单个帖子-->
+    <update id="removePostById">
+         update post set post_del=1 where post_id = #{postId};
+    </update>
+
+    <!--批量修改文章的推荐状态-->
+    <update id="updateRecommendByIds">
+        update post
+
+            set is_recommend = #{recommendState} where post_id in
+        <foreach collection="postIds" index="index" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!--修改文章的推荐状态-->
+    <update id="updateRecommendByID">
+         update post set is_recommend = #{recommendState} where post_id = #{postId}
+    </update>
+
+    <!--批量彻底删除帖子-->
+    <delete id="deletePostByIds">
+        delete from post where post_id in
+        <foreach collection="postIds" index="index" item="item" separator="," open="(" close=")">
+        #{item}
+      </foreach>
+    </delete>
+    <!--彻底删除帖子-->
+    <delete id="deletePostById">
+        delete from post where post_id = #{postId}
+    </delete>
+
+
+    <resultMap id="postVoMap" type="PostVo">
+        <!--帖子ID-->
+        <id property="postId" column="post_id"/>
+        <!--帖子标题-->
+        <result property="postTitle" column="post_title"/>
+        <!--帖子发布时间-->
+        <result property="postTime" column="post_time"/>
+        <!--发帖用户Id-->
+        <result property="user.userId" column="user_id"/>
+        <!--小圈子id-->
+        <result property="circleId" column="circle_id"/>
+        <!--x小圈子名字-->
+        <result property="circleName" column="circle_name"/>
+        <!--大圈子ID-->
+        <result property="categoryId" column="category_id"/>
+        <!--大圈子名字-->
+        <result property="categoryName" column="category_name"/>
+        <association property="countComment" column="post_id" javaType="java.lang.Integer"
+                     select="countPostComment"/>
+        <association property="countFabulous" column="post_id" javaType="java.lang.Integer"
+                     select="countPostFabulous"/>
+        <association property="countCollection" column="post_id" javaType="java.lang.Integer"
+                     select="countPostCollection"/>
+        <association property="user" column="user_id" javaType="User"
+                     select="com.cn.dao.UserMapper.findUser"/>
+
+    </resultMap>
+    <!--条件查找回收站的文件-->
+    <select id="findAllByDelPostWhere"  resultMap="postVoMap">
+        select p.post_id,p.post_title,p.post_time,c.circle_id,c.circle_name,cg.category_id,cg.category_name as category_name,p.user_id
+        from post  p
+        /* 小圈子*/
+        left join circle c on c.circle_id = p.circle_id
+        /*大圈子*/
+        left join category cg on  c.category_id = cg.category_id
+        where p.post_del = 1
+        /*通过文章标题模糊查询*/
+        <if test="postVo.postTitle != null">
+            and p.post_title like '%${postVo.postTitle}%'
+        </if>
+        /*通过用户名字模糊查询*/
+        <if test="postVo.user != null and postVo.user.userName != null">
+            and p.user_id in (select u.user_id from user u where u.user_name like '%${postVo.user.userName}%')
+        </if>
+        /*通过小圈子ID*/
+        <if test="postVo.circleId !=null and postVo.circleId >0">
+            and c.circle_id = #{postVo.circleId }
+        </if>
+        /*通过大圈子ID*/
+        <if test="postVo.categoryId =null and postVo.categoryId > 0">
+            and cg.category_id = #{postVo.categoryId}
+        </if>
+         order by p.post_time desc
+    </select>
+
+    <!--查询所有回收站的帖子-->
+    <select id="findAllByDelPost" resultMap="postVoMap">
+        select p.post_id,p.post_title,p.post_time,c.circle_id,c.circle_name,cg.category_id,cg.category_name as category_name,p.user_id
+        from post  p
+        /* 小圈子*/
+        left join circle c on c.circle_id = p.circle_id
+        /*大圈子*/
+        left join category cg on  c.category_id = cg.category_id
+        where p.post_del = 1 order by p.post_time desc
+    </select>
+
+    <!--通过推荐状态，条件查找帖子-->
+    <select id="findAllByRecommendStateWhere" resultMap="postVoMap">
+        select p.post_id,p.post_title,p.post_time,c.circle_id,c.circle_name,cg.category_id,cg.category_name as category_name,p.user_id
+        from post  p
+        /* 小圈子*/
+        left join circle c on c.circle_id = p.circle_id
+        /*大圈子*/
+        left join category cg on  c.category_id = cg.category_id
+        where p.post_del = 0 and p.is_recommend = #{recommendState}
+        /*通过文章标题模糊查询*/
+        <if test="postVo.postTitle != null">
+            and p.post_title like '%${postVo.postTitle}%'
+        </if>
+        /*通过用户名字模糊查询*/
+        <if test="postVo.user != null and postVo.user.userName != null">
+            and p.user_id in (select u.user_id from user u where u.user_name like '%${postVo.user.userName}%')
+        </if>
+        /*通过小圈子ID*/
+        <if test="postVo.circleId !=null and postVo.circleId >0">
+            and c.circle_id = #{postVo.circleId }
+        </if>
+        /*通过大圈子ID*/
+        <if test="postVo.categoryId =null and postVo.categoryId > 0">
+            and cg.category_id = #{postVo.categoryId}
+        </if>
+          order by p.post_time desc
+    </select>
+
+    <!--通过推荐状态查找所有帖子-->
+    <select id="findAllByRecommendState" resultMap="postVoMap">
+      select p.post_id,p.post_title,p.post_time,c.circle_id,c.circle_name,cg.category_id,cg.category_name as category_name,p.user_id
+        from post  p
+        /* 小圈子*/
+        left join circle c on c.circle_id = p.circle_id
+        /*大圈子*/
+        left join category cg on  c.category_id = cg.category_id
+        where p.post_del = 0 and p.is_recommend = #{recommendState}
+          order by p.post_time desc
+
+    </select>
+    <!--统计当前文章点赞数-->
+    <select id="countPostFabulous" resultType="java.lang.Integer">
+        select count(post_id) from post_fabulous  where post_id = #{postId}
+    </select>
+    <!--统计当前文章评论数-->
+    <select id="countPostComment" resultType="java.lang.Integer">
+        select count(comment_id) from comment where post_id = #{postId}
+    </select>
+    <!--统计当前文章收藏数-->
+    <select id="countPostCollection" resultType="java.lang.Integer">
+        select count(up_id) from user_post where post_id = #{postId}
+    </select>
+
+    <!--通过帖子题目查询帖子(wmy)-->
+    <select id="findByPostTitle" resultMap="postUser">
+        select * from post
+        <where>
+            <if test="postTitle == null">
+                and post_title like concat(concat('%','妈妈优选','%'))
+            </if>
+            <if test="postTitle != null">
+                and post_title like concat(concat('%',#{postTitle},'%'))
+            </if>
+        </where>
+    </select>
+    <!--查询用户发表的帖子-->
+    <select id="findByUserId" resultType="com.cn.pojo.Post">
+        select * from post where user_id = #{userId} and and post_del = 0 order by post_time desc
+    </select>
+
+
+    <resultMap id="postUser" type="Post">
+        <id property="postId" column="post_id"/>
+        <result property="postTitle" column="post_title"/>
+        <result property="postContent" column="post_content"/>
+        <result property="circleId" column="circle_id"/>
+        <result property="isRecommend" column="is_recommend"/>
+        <result property="postDel" column="post_del"/>
+        <result property="postTime" column="post_time"/>
+        <result property="userId" column="user_id"/>
+
+        <association property="user" javaType="User" column="user_id"
+                     select="com.cn.dao.UserMapper.findUser"/>
+    </resultMap>
+
+</mapper>

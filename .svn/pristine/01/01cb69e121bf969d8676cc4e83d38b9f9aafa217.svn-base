@@ -1,0 +1,17 @@
+package com.cn.dao;
+
+import com.cn.pojo.Answer;
+
+/**
+ * @author Tyquan
+ * @date 2019/11/28 16:22
+ */
+public interface AnswerMapper {
+    /**
+     * 通过问题id查询answer
+     *
+     * @param questionId
+     * @return
+     */
+    Answer findAnswerByQuestionId(Integer questionId);
+}

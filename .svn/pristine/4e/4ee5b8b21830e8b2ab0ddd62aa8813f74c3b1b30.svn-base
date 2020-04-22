@@ -1,0 +1,16 @@
+package com.cn.dao;
+
+import com.cn.pojo.PostImg;
+
+import java.util.List;
+
+public interface PostImgPostMapper {
+
+    /**
+     * 通过帖子ID查询图片
+     * @author 尤翔龙
+     * @param postId
+     * @return
+     */
+    List<PostImg> findPostImgByPostId(Integer postId);
+}

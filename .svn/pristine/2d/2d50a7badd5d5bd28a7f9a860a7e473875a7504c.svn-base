@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cn.dao.UserMapper">
+
+    <!--注册用户-->
+    <insert id="adduser">
+          insert into user (user_phone,user_password,user_start_time) values (#{userPhone},#{userPassword},#{userStartTime})
+    </insert>
+    <!--往临时表添加记录-->
+    <insert id="addRegister">
+        insert into register (register_phone, register_code) values (#{registerPhone},#{registerCode})
+    </insert>
+    <!--通过用户id修改当前的状态-->
+    <update id="updateState">
+        update  user_state set state_id=#{param2},state_starttime=#{param3}  WHERE user_id = #{param1}
+    </update>
+    <!--修改用户的资料-->
+    <update id="updateuser">
+        update user <set>
+
+    </set>
+    </update>
+    <!--修改注册表的信息-->
+    <update id="updateRegister">
+        update register set register_code = #{registerCode} where register_phone=#{registerPhone}
+    </update>
+
+    <!--通过账号密码查询用户-->
+    <select id="login" resultType="com.cn.pojo.User">
+        select * from user where user_phone=#{userPhone} and user_password=#{userPassword}
+    </select>
+    <!--通过用户id查询该用户当前的状态-->
+    <select id="decideState" resultType="com.cn.pojo.UserState">
+        select state_id from user_state where user_id=#{userId}
+    </select>
+    <!--通过用户的id查询用户-->
+    <select id="findUser" resultType="com.cn.pojo.User">
+        select *  from user where user_id = #{userId}
+    </select>
+    <!--统计某个user的粉丝数量-->
+    <select id="countFants" resultType="java.lang.Integer">
+        select count(user_id) from user_user where user_id=#{userId}
+    </select>
+
+    <!-- ///////////////////////////////////////////////////-尤翔龙-/////////////////////////////////////////////////// -->
+
+    <!--通过用户的id查询用户 （帖子一对一关联）-->
+    <select id="findUserByUserId" resultMap="userPost" parameterType="int">
+        select user_id,user_name,user_img_url from user where user_id = #{userId}
+    </select>
+
+    <!--用户与帖子 一对一关系映射-->
+    <resultMap id="userPost" type="User">
+        <id column="user_id" property="userId"/>
+        <result column="user_name" property="userName"/>
+        <result column="user_img_url" property="userImgUrl"/>
+    </resultMap>
+
+    <!--关注用户-->
+    <insert id="followUser">
+        insert into follow_user(user_id,follow_user_id) values(#{userId},#{followUserId})
+    </insert>
+
+    <!--取消关注用户-->
+    <delete id="notFollowUser">
+        delete from follow_user where user_id=#{userId} and follow_user_id=#{followUserId}
+    </delete>
+
+    <!--判断是否已关注-->
+    <select id="isFollow" resultType="java.lang.Integer">
+        select * from follow_user where user_id=#{userId} and follow_user_id=#{followUserId}
+    </select>
+
+    <!-- ///////////////////////////////////////////////////管理员操作-李静的Mapper,放在下面///////////////////////////////// -->
+    <resultMap id="userStateMap" type="User">
+        <!--用户：状态=1:1-->
+        <id property="userId" column="user_id" />
+        <result property="userName" column="user_name" />
+        <result property="userPhone" column="user_phone" />
+        <result property="userPassword" column="user_password" />
+        <result property="userImgUrl" column="user_img_url" />
+        <result property="userStartTime" column="user_start_time" />
+        <result property="userPostCount" column="user_post_count" />
+        <result property="userCollectCount" column="user_collect_count" />
+        <result property="userBirthday" column="user_birthday" />
+        <result property="userDel" column="user_del" />
+        <association property="state" column="user_id" javaType="State"
+                     select="com.cn.dao.StateMapper.findStateByUserId"/>
+    </resultMap>
+
+    <!--查找所有用户信息-->
+    <select id="findAllUser" resultMap="userStateMap">
+        select user_id,user_name,user_phone,user_password,user_img_url,user_start_time,user_post_count,user_collect_count,user_birthday,user_del
+        from user where user_del=0
+    </select>
+
+    <!--查找所有用户信息-->
+    <select id="findAllDelUser" resultMap="userStateMap">
+        select user_id,user_name,user_phone,user_password,user_img_url,user_start_time,user_post_count,user_collect_count,user_birthday,user_del
+        from user where user_del=1
+    </select>
+
+    <!--模糊查询 根据用户提供的 姓名模糊 及状态-->
+    <select id="findUserByConditions" resultMap="userStateMap">
+        select user_id,user_name,user_phone,user_password,user_img_url,user_start_time,user_post_count,user_collect_count,user_birthday,user_del
+        from user u
+        left join user_state us on u.user_id=us.user_id
+        <where>
+            u.user_del = 0
+            <!--'%${bussName}%'-->
+            <if test="param1 != null and param1 != ''">
+                and u.user_name like concat('%',#{param1},'%')
+            </if>
+            <if test="param2 != null and param2 != 1">
+                and us.state_id = #{param2}
+            </if>
+        </where>
+    </select>
+
+    <!--根据用户id查找用户-->
+    <select id="findUserById" resultMap="userStateMap">
+        select user_id,user_name,user_phone,user_password,user_img_url,user_start_time,user_post_count,user_collect_count,user_birthday,user_del
+         from user where user_id=#{userId} order by user_id
+    </select>
+
+    <!--根据用户id删除(假删)用户-->
+    <update id="delUser">
+        update user set user_del = 1 where user_id=#{userId}
+    </update>
+
+    <!--根据用户id组删除(假删)用户-->
+    <update id="delUsers">
+        update user set user_del = 1  where user_id in
+        <foreach collection="ids" index="index" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!--根据用户id恢复用户-->
+    <update id="resumeUser">
+        update user set user_del = 0 where user_id=#{userId}
+    </update>
+
+    <!--根据用户id删除(真删)用户-->
+    <delete id="deleteUser">
+        delete from user where user_id=#{userId}
+    </delete>
+
+    <!--根据用户id组删除(真删)用户-->
+    <update id="deleteUsers">
+        delete from user where user_id in
+        <foreach collection="ids" index="index" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+    <!-- ///////////////////////////////////////////////////管理员操作-李静的Mapper下面///////////////////////////////// -->
+    <!--通过手机号查询临时注册表-->
+    <select id="findRegister" resultType="com.cn.pojo.Register">
+        select * from register where register_phone=#{phone}
+    </select>
+
+    <!--判断手机号和验证码是否正确-->
+    <select id="findRegisterAll" resultType="com.cn.pojo.Register">
+        select * from register where register_phone=#{registerPhone} and register_code=#{registerCode}
+    </select>
+    <select id="findByUserName" resultType="com.cn.pojo.User">
+        select *  from user
+        <where>
+            <if test="userName == null">
+                and user_name like concat(concat('%','妈妈优选','%'))
+            </if>
+            <if test="userName != null">
+                and user_name like concat(concat('%',#{userName},'%'))
+            </if>
+        </where>
+    </select>
+
+    <!--查询userState-->
+    <select id="findUserStateStateId" resultType="com.cn.pojo.UserState">
+        select * from user_state where user_id = #{userId}
+    </select>
+
+    <!--///////////////////////////////////////////////////////////////////-->
+
+
+
+
+
+
+
+</mapper>

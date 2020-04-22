@@ -1,0 +1,43 @@
+package com.cn.service.impl;
+
+import com.cn.dao.AdminMapper;
+import com.cn.dto.JsonResult;
+import com.cn.pojo.Admin;
+import com.cn.service.AdminService;
+import com.cn.utils.JwtUtil;
+import com.cn.utils.MD5Util;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * Created with IntelliJ IDEA.
+ * User: wmy
+ * Date: 2019/11/28 9:48
+ * Description:
+ */
+@SuppressWarnings("all")
+@Service
+@Transactional(rollbackFor = Throwable.class)
+public class AdminServiceImpl implements AdminService {
+
+    @Autowired
+    private AdminMapper adminMapper;
+
+    @Override
+    public JsonResult<Admin> login(String adminName, String password) {
+        Admin dbAdmin = adminMapper.findByName(adminName);
+        if(dbAdmin == null){
+            //用户不存在
+            return new JsonResult<>(4001,"没有该用户");
+        }
+
+        if(! dbAdmin.getAdminPassword().equals(MD5Util.MD55(password))){
+            return new JsonResult<>(4002,"密码不正确");
+        }
+        //把结果保存在token中
+        String token = JwtUtil.sign(dbAdmin, dbAdmin.getAdminId());
+
+        return new JsonResult(200,"登录成功",token);
+    }
+}

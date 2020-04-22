@@ -1,0 +1,94 @@
+package com.cn.pojo;
+
+public class User {
+  private Integer userId;
+  private String userName;
+  private Integer userPhone;
+  private String userPassword;
+  private String userImgUrl;
+  private java.sql.Date userStartrime;
+  private Integer userPostCount;
+  private Integer userCollectCount;
+  private java.sql.Date userBirthday;
+  private Integer userDel;
+
+  public Integer getUserId() {
+    return userId;
+  }
+
+  public void setUserId(Integer userId) {
+    this.userId = userId;
+  }
+
+  public String getUserName() {
+    return userName;
+  }
+
+  public void setUserName(String userName) {
+    this.userName = userName;
+  }
+
+  public Integer getUserPhone() {
+    return userPhone;
+  }
+
+  public void setUserPhone(Integer userPhone) {
+    this.userPhone = userPhone;
+  }
+
+  public String getUserPassword() {
+    return userPassword;
+  }
+
+  public void setUserPassword(String userPassword) {
+    this.userPassword = userPassword;
+  }
+
+  public String getUserImgUrl() {
+    return userImgUrl;
+  }
+
+  public void setUserImgUrl(String userImgUrl) {
+    this.userImgUrl = userImgUrl;
+  }
+
+  public java.sql.Date getUserStartrime() {
+    return userStartrime;
+  }
+
+  public void setUserStartrime(java.sql.Date userStartrime) {
+    this.userStartrime = userStartrime;
+  }
+
+  public Integer getUserPostCount() {
+    return userPostCount;
+  }
+
+  public void setUserPostCount(Integer userPostCount) {
+    this.userPostCount = userPostCount;
+  }
+
+  public Integer getUserCollectCount() {
+    return userCollectCount;
+  }
+
+  public void setUserCollectCount(Integer userCollectCount) {
+    this.userCollectCount = userCollectCount;
+  }
+
+  public java.sql.Date getUserBirthday() {
+    return userBirthday;
+  }
+
+  public void setUserBirthday(java.sql.Date userBirthday) {
+    this.userBirthday = userBirthday;
+  }
+
+  public Integer getUserDel() {
+    return userDel;
+  }
+
+  public void setUserDel(Integer userDel) {
+    this.userDel = userDel;
+  }
+}

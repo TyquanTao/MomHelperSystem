@@ -1,0 +1,121 @@
+package com.cn.pojo.vo;
+
+import com.cn.pojo.Post;
+
+import java.sql.Timestamp;
+
+/**
+ * 此类为文章后台管理界面展示的内容
+ * @author 周鑫
+ */
+public class PostVo extends Post {
+
+    private String circleName;//文章所属小圈子名字
+    private Integer categoryId;//文章所属大圈子Id
+    private String categoryName;//文章所属大圈子名字
+    private Integer countFabulous;//文章点赞数统计
+    private Integer countComment;//文章帖子回复数
+    private Integer countCollection;//文章收藏统计
+
+    // 判断用户是否点赞 0未点赞 1已点赞
+    private Integer isLike;
+    // 判断用户是否收藏 0未收藏 1已收藏
+    private Integer isCollect;
+    //判断用户是否关注发帖人 0未关注   1已关注
+    private Integer isFollow;
+
+    public PostVo() {
+    }
+
+    public PostVo(Integer postId, String postTitle, String postContent, String postImgUrl, Integer circleId, Integer postDel, Timestamp postTime, Integer userId, Integer isRecommend, String circleName, Integer categoryId, String categoryName, Integer countFabulous, Integer countComment, Integer countCollection) {
+        this.circleName = circleName;
+        this.categoryId = categoryId;
+        this.categoryName = categoryName;
+        this.countFabulous = countFabulous;
+        this.countComment = countComment;
+        this.countCollection = countCollection;
+    }
+
+    public String getCircleName() {
+        return circleName;
+    }
+
+    public void setCircleName(String circleName) {
+        this.circleName = circleName;
+    }
+
+    public Integer getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
+    public Integer getCountFabulous() {
+        return countFabulous;
+    }
+
+    public void setCountFabulous(Integer countFabulous) {
+        this.countFabulous = countFabulous;
+    }
+
+    public Integer getCountComment() {
+        return countComment;
+    }
+
+    public void setCountComment(Integer countComment) {
+        this.countComment = countComment;
+    }
+
+    public Integer getCountCollection() {
+        return countCollection;
+    }
+
+    public void setCountCollection(Integer countCollection) {
+        this.countCollection = countCollection;
+    }
+
+    public Integer getIsLike() {
+        return isLike;
+    }
+
+    public void setIsLike(Integer isLike) {
+        this.isLike = isLike;
+    }
+
+    public Integer getIsCollect() {
+        return isCollect;
+    }
+
+    public void setIsCollect(Integer isCollect) {
+        this.isCollect = isCollect;
+    }
+
+    public Integer getIsFollow() {
+        return isFollow;
+    }
+
+    public void setIsFollow(Integer isFollow) {
+        this.isFollow = isFollow;
+    }
+    @Override
+    public String toString() {
+        return "PostVo{" +
+                "circleName=" + circleName +
+                ", cateoryId=" + categoryId +
+                ", cateoryName=" + categoryName +
+                ", countFabulous=" + countFabulous +
+                ", countComment=" + countComment +
+                ", countCollection=" + countCollection +
+                '}';
+    }
+}

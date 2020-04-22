@@ -1,0 +1,49 @@
+package com.cn.service.impl;
+
+import com.cn.dao.MessagePushMapper;
+import com.cn.dao.UserMapper;
+import com.cn.pojo.MessagePush;
+import com.cn.pojo.UserState;
+import com.cn.service.MessagePushService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.logging.SimpleFormatter;
+
+/**
+ * Created with IntelliJ IDEA.
+ * User: wmy
+ * Date: 2019/12/01 22:49
+ * Description:
+ */
+@SuppressWarnings("all")
+@Transactional(rollbackFor = Throwable.class)
+@Service
+public class MessagePushServiceImp implements MessagePushService {
+
+    @Autowired
+    private MessagePushMapper messagePushMapper;
+
+    @Autowired
+    private UserMapper userMapper;
+
+
+    @Override
+    public MessagePush findNowDay(Integer userId) {
+        UserState userState = userMapper.findUserStateStateId(userId);
+        String dayString = new SimpleDateFormat("d").format(System.currentTimeMillis() - userState.getStateStarttime().getTime());
+        Integer day = Integer.parseInt(dayString);
+        if(userState.getStateId() == 2){
+
+        }else if(userState.getStateId() == 3){
+            MessagePush messagePush = messagePushMapper.findNowDay(3, day);
+        }else if(userState.getStateId() == 4){
+
+        }
+
+        return null;
+    }
+}

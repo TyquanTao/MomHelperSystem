@@ -1,0 +1,54 @@
+package com.cn.service.impl;
+
+import com.cn.dao.PostMapper;
+import com.cn.dto.JsonResult;
+import com.cn.pojo.Post;
+import com.cn.service.PostSerivce;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class PostSerivceImpl implements PostSerivce {
+
+    @Autowired
+    private PostMapper postMapper;
+
+    /**
+     * 通过帖子ID删除帖子（软删）
+     * @author 尤翔龙
+     * @param postId
+     * @return
+     */
+    @Override
+    public JsonResult<Post> deleteByPostId(Integer postId) {
+        if (postId==null) {
+            return new JsonResult<>(4001,"帖子ID不能为空");
+        }else {
+            Boolean test = postMapper.deleteByPostId(postId);
+            if (test) {
+                return new JsonResult<>(200,"删除成功");
+            }
+            return new JsonResult<>(4002,"帖子ID错误");
+        }
+
+    }
+
+    /**
+     * 修改帖子
+     * @author 尤翔龙
+     * @param post
+     * @return
+     */
+    @Override
+    public JsonResult<Post> updatePost(Post post) {
+        if (post==null) {
+            return new JsonResult<>(4003,"帖子格式错误");
+        }else{
+            Integer aa = postMapper.updatePost(post);
+            if (aa>0) {
+                return new JsonResult<>(200,"修改成功");
+            }
+        }
+        return new JsonResult<>(4003,"修改失败");
+    }
+}

@@ -1,0 +1,25 @@
+package com.cn.dao;
+
+import com.cn.pojo.Question;
+
+/**
+ * @author Tyquan
+ * @date 2019/11/28 10:08
+ */
+public interface QuestionMapper {
+
+    /**
+     * 提交问题（新建问题）
+     *
+     * @param question 新增问题的内容
+     * @return 受影响的行数
+     */
+    Integer addQuestion(Question question);
+
+    /**
+     *
+     * @param questionId
+     * @return
+     */
+    Question findQuestionById(Integer questionId);
+}

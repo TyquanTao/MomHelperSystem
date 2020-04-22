@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cn.dao.AnswerFabulousMapper">
+    <!--过回答id查询点赞的人-->
+    <select id="findUserByAnswerId" resultType="com.cn.pojo.AnswerFabulous">
+        select user_id
+        from answer_fabulous where answer_fabulous_id = #{answerId}
+    </select>
+</mapper>

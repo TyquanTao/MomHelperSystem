@@ -1,0 +1,17 @@
+package com.cn.pojo.vo;
+
+import com.cn.pojo.Comment;
+
+public class CommentVo extends Comment{
+
+    //判断用户是否点赞
+    private Integer isLike;
+
+    public Integer getIsLike() {
+        return isLike;
+    }
+
+    public void setIsLike(Integer isLike) {
+        this.isLike = isLike;
+    }
+}

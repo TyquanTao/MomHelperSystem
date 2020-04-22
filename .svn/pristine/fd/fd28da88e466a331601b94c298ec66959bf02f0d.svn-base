@@ -1,0 +1,61 @@
+package com.cn.service.impl;
+
+import com.cn.dao.UserMapper;
+import com.cn.dto.JsonResult;
+import com.cn.pojo.User;
+import com.cn.pojo.UserState;
+import com.cn.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+@SuppressWarnings("all")
+public class UserServiceImpl implements UserService {
+
+    @Autowired
+    private UserMapper userMapper;
+
+    /**
+     * 登录方法
+     * @param userPhone：用户的手机号（登陆账号
+     * @param password：密码
+     *               张鹏
+     * @return
+     */
+    @Override
+    public JsonResult<User> login(Integer userPhone,String password) {
+        User login = userMapper.login(userPhone,password);
+        return new JsonResult<>(200,"success",login);
+    }
+
+    /**
+     * 判断用户的 状态
+     * @param id:用户的id
+     * @return
+     * 张鹏
+     */
+    @Override
+    public Boolean decideState(Integer id) {
+        UserState userState = userMapper.decideState(id);
+        if (userState.getStateId()==1){
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 修改用户的状态
+     * @param userId  用户的id
+     * @param stateId 状态的id
+     * @return
+     * 张鹏
+     */
+    @Override
+    public Boolean updateState(Integer userId, Integer stateId) {
+        Integer integer = userMapper.updateState(userId, stateId);
+        if (integer>0){
+            return true;
+        }
+        return false;
+    }
+}

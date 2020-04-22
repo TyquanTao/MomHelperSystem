@@ -1,0 +1,73 @@
+package com.cn.service.impl;
+
+import com.aliyuncs.exceptions.ClientException;
+import com.cn.dao.AdminMapper;
+import com.cn.dto.JsonResult;
+import com.cn.pojo.Admin;
+import com.cn.service.AdminService;
+import com.cn.utils.JwtUtil;
+import com.cn.utils.MD5Util;
+import com.cn.utils.RandomNumberUtil;
+import com.cn.utils.SendCodeUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * Created with IntelliJ IDEA.
+ * User: wmy
+ * Date: 2019/11/28 9:48
+ * Description:
+ */
+@SuppressWarnings("all")
+@Service
+@Transactional(rollbackFor = Throwable.class)
+public class AdminServiceImpl implements AdminService {
+
+    @Autowired
+    private AdminMapper adminMapper;
+
+    @Override
+    public JsonResult<Admin> login(String adminName, String password) {
+        Admin dbAdmin = adminMapper.findByAdminName(adminName);
+        if(dbAdmin == null){
+            //用户不存在
+            return new JsonResult<>(4001,"没有该用户");
+        }
+
+        if(! dbAdmin.getAdminPassword().equals(MD5Util.MD55(password))){
+            return new JsonResult<>(4002,"密码不正确");
+        }
+        //把结果保存在token中
+        String token = JwtUtil.sign(dbAdmin, dbAdmin.getAdminId());
+
+        return new JsonResult(200,"登录成功",token,dbAdmin.getAdminId());
+    }
+
+    @Override
+    public JsonResult<Admin> findByAdminName(String adminName, String adminPhone) throws ClientException {
+        Admin byAdminName = adminMapper.findByAdminName(adminName);
+        if(byAdminName == null){
+            return new JsonResult(4001,"用户名错误，没有该用户");
+        }
+        Admin dbAdmin = adminMapper.findByAdminNameAndAdminPhone(adminName, adminPhone);
+        if(dbAdmin == null){
+            return new JsonResult(4011,"该手机号不是绑定的手机号");
+        }
+        String code = RandomNumberUtil.getCode();
+        SendCodeUtil.sendSms(adminPhone,code);
+
+        return new JsonResult(200,"验证码发送成功",code);
+    }
+
+    @Override
+    public JsonResult<Admin> updateAdminPassword(Integer adminId, String adminPassword) {
+        if(adminId != null && adminPassword != null){
+            adminMapper.updateAdminPassword(adminId,adminPassword);
+            return new JsonResult(200,"密码修改成功");
+        }
+        return new JsonResult(4020,"密码修改错误");
+    }
+
+
+}

@@ -1,0 +1,62 @@
+package com.cn.service.impl;
+
+import com.cn.dao.CircleMapper;
+import com.cn.dao.UserCircleMapper;
+import com.cn.dto.JsonResult;
+import com.cn.pojo.Circle;
+import com.cn.pojo.UserCircle;
+import com.cn.service.CircleService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class CircleServiceImpl implements CircleService {
+    @Autowired
+    private UserCircleMapper userCircleMapper;
+    @Autowired
+    private CircleMapper circleMapper;
+
+    /**
+     * 查询小圈子列表
+     * @return
+     */
+    @Override
+    public JsonResult findAllCircle() {
+        List<Circle> list=circleMapper.findAllCircle();
+        if(list.size()>0){
+            return new JsonResult(200,"success",list);
+        }
+        return new JsonResult(4000,"查询失败！");
+    }
+
+    /**
+     * 根据大圈子ID查询小圈子列表
+     * @from：罗世杰
+     * @param categoryId
+     * @return
+     */
+    @Override
+    public JsonResult findById(Integer categoryId) {
+        List<Circle> circles=circleMapper.findById(categoryId);
+        if(circles.size()>0){
+            return new JsonResult(200,"success",circles);
+        }
+        return new JsonResult(4001,"查询失败！");
+    }
+
+    /**
+     * 用户关注的圈子列表
+     * @param userId
+     * @return
+     */
+    @Override
+    public JsonResult findByUserId(Integer userId) {
+        List<UserCircle> circles=userCircleMapper.findByUserId(userId);
+        if(circles.size()>0){
+            return new JsonResult(200,"success",circles);
+        }
+        return  new JsonResult(200,"查询失败！");
+    }
+}

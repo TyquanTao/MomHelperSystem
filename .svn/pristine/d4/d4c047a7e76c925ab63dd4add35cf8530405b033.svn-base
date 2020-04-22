@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.cn.dao.QuestionMapper">
+
+    <!--新增问题/提交问题-->
+    <insert id="addQuestion" parameterType="question">
+        insert into question(question_title,question_content,user_id,question_time)
+        VALUES (#{questionTitle},#{questionContent},#{userId},#{questionTime})
+    </insert>
+
+    <!--问题详情map 当前问题和回答此问题的回答-->
+    <resultMap id="questionAnswerMap" type="question">
+        <id property="questionId" column="question_id"/>
+        <result property="questionTitle" column="question_title"/>
+        <result property="questionContent" column="question_content"/>
+        <result property="questionTime" column="question_time"/>
+        <result property="questionPoints" column="question_points"/>
+        <result property="questionCollections" column="question_collections"/>
+        <collection property="answers" ofType="Answer" column="question_id"
+                    select="com.cn.dao.AnswerMapper.findAnswerByQuestionId"/>
+    </resultMap>
+    <!--通过问题id查询问题详情，并通过questionId查询出所有的回答详情-->
+    <select id="findQuestionById" resultMap="questionAnswerMap">
+        select question_id,question_title,question_content,question_time,question_points,question_collections
+        from question
+        where question_id = #{questionId} and question_del = 0
+    </select>
+    <!--通过热度降序查询所有问题-->
+    <select id="findAllByHot" resultType="com.cn.pojo.Question">
+        SELECT *,(question_collections+question_points) as total
+        from question
+        ORDER BY total DESC
+    </select>
+</mapper>

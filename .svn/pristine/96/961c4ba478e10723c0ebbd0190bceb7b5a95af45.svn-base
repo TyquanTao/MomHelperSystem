@@ -1,0 +1,86 @@
+package com.cn.pojo;
+
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.sql.Timestamp;
+
+public class Answer {
+
+  private Integer answerId;
+  private Integer questionId;
+  private String answerContent;
+  private Integer userId;
+  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT-8")
+  private Timestamp answerTime;
+  private Integer answerDel;
+
+  public Answer() {
+  }
+
+  @Override
+  public String toString() {
+    return "Answer{" +
+            "answerId=" + answerId +
+            ", questionId=" + questionId +
+            ", answerContent='" + answerContent + '\'' +
+            ", userId=" + userId +
+            ", answerTime=" + answerTime +
+            ", answerDel=" + answerDel +
+            '}';
+  }
+
+  public Integer getAnswerId() {
+    return answerId;
+  }
+
+  public void setAnswerId(Integer answerId) {
+    this.answerId = answerId;
+  }
+
+
+  public Integer getQuestionId() {
+    return questionId;
+  }
+
+  public void setQuestionId(Integer questionId) {
+    this.questionId = questionId;
+  }
+
+
+  public String getAnswerContent() {
+    return answerContent;
+  }
+
+  public void setAnswerContent(String answerContent) {
+    this.answerContent = answerContent;
+  }
+
+
+  public Integer getUserId() {
+    return userId;
+  }
+
+  public void setUserId(Integer userId) {
+    this.userId = userId;
+  }
+
+
+  public Timestamp getAnswerTime() {
+    return answerTime;
+  }
+
+  public void setAnswerTime(Timestamp answerTime) {
+    this.answerTime = answerTime;
+  }
+
+
+  public Integer getAnswerDel() {
+    return answerDel;
+  }
+
+  public void setAnswerDel(Integer answerDel) {
+    this.answerDel = answerDel;
+  }
+
+}

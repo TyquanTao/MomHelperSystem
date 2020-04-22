@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cn.dao.BannerMapper">
+
+    <!--//////////////////////////////////////////李静的代码,别动！！//////////////////////////////-->
+
+    <!--问答BannerVoMap-->
+    <resultMap id="bannerVoQustionMap" type="BannerVo">
+        <id property="bannerId" column="banner_id" />
+        <result property="bannerName" column="banner_name" />
+        <result property="imgUrl" column="img_url"  />
+        <association property="question" column="question_id" javaType="Question"
+                     select="com.cn.dao.QuestionMapper.findQuestionById" />
+    </resultMap>
+
+    <!--主页BannerVoMap-->
+    <resultMap id="bannerVoUserMap" type="BannerVo">
+        <id property="bannerId" column="banner_id" />
+        <result property="bannerName" column="banner_name" />
+        <result property="imgUrl" column="img_url"  />
+        <association property="post" column="post_id" javaType="Post"
+                     select="com.cn.dao.QuestionMapper.findQuestionById" />
+    </resultMap>
+
+    <!--圈子BannerVoMap-->
+    <resultMap id="bannerVoCircleMap" type="BannerVo">
+        <id property="bannerId" column="banner_id" />
+        <result property="bannerName" column="banner_name" />
+        <result property="imgUrl" column="img_url"  />
+    </resultMap>
+
+    <!--向banner中存入数据-->
+    <insert id="saveBanner" keyProperty="bannerId" useGeneratedKeys="true">
+        insert into banner (banner_name, banner_type) values (#{bannerName},#{bannerType})
+    </insert>
+
+    <!--根据Banner的类型展示对应的banner-->
+    <select id="bannerList" resultType="com.cn.pojo.Banner">
+        select banner_id,banner_name,banner_type from banner
+        where banner_type=#{bannerType} and banner_del=0
+        order by banner_id
+    </select>
+
+    <!--根据BannerId查找问答的Banner-->
+    <select id="findBQByBannerId" resultMap="bannerVoQustionMap">
+        select b.banner_id,b.banner_name,bq.img_url,q.question_id,q.question_title
+        from banner b
+        left join banner_question bq on b.banner_id=bq.banner_id
+        left join question q on bq.question_id=q.question_id
+        where b.banner_id=#{bannerId} and banner_del=0
+    </select>
+
+    <!--根据BannerId查找主页(社区)的Banner-->
+    <select id="findBUByBannerId" resultMap="bannerVoUserMap">
+        select b.banner_id,b.banner_name,bu.img_url,p.post_id,p.post_title
+        from banner b
+        left join banner_user bu on b.banner_id=bu.banner_id
+        left join post p on bu.post_id=p.post_id
+        where b.banner_id=#{bannerId} and b.banner_del=0
+    </select>
+
+    <!--根据BannerId查找圈子的Banner-->
+    <select id="findBCByBannerId" resultMap="bannerVoCircleMap">
+        select b.banner_id,b.banner_name,bq.img_url
+        from banner b
+        left join banner_question bq on b.banner_id=bq.banner_id
+        where b.banner_id=#{bannerId} and b.banner_del=0
+    </select>
+
+    <!--Banner-问答关联表中添加数据-->
+    <insert id="saveBQImg">
+        insert into banner_question (question_id, banner_id, img_url) values (#{questionId},#{bannerId},#{imgUrl})
+    </insert>
+
+    <!--Banner-主页关联表中添加数据-->
+    <insert id="saveBUImg">
+        insert into banner_user (post_id, banner_id, img_url) values (#{postId},#{bannerId},#{imgUrl})
+    </insert>
+
+    <!--Banner-圈子关联表中添加数据-->
+    <insert id="saveBCImg">
+        insert into banner_circle (banner_id, img_url) values (#{bannerId},#{imgUrl})
+    </insert>
+
+    <!--根据Id删除Banner-->
+    <update id="delBannerById">
+        update banner set banner_del = 1 where banner_id=#{bannerId}
+    </update>
+
+    <!--根据BannerId修改Banner的name-->
+    <update id="updateBannerById">
+        update banner set banner_name = #{bannerName} where banner_id=#{bannerId}
+    </update>
+
+    <!--修改社区Banner的相关(图片，文章)-->
+    <update id="updateBUBanner">
+        update banner_user bu
+        <set>
+            <if test="imgUrl != null and imgUrl != ''">
+                bu.img_url = #{imgUrl},
+            </if>
+            <if test="postId != null and postId != ''" >
+                bu.postId = #{postId}
+            </if>
+        </set>
+        where bu.banner_id=#{bannerId}
+    </update>
+
+    <!--修改问答Banner的相关(图片，文章)-->
+    <update id="updateBQBanner">
+        update banner_question bq
+        <set>
+            <if test="imgUrl != null and imgUrl != ''">
+                bq.img_url = #{imgUrl},
+            </if>
+            <if test="questionId != null and questionId != ''" >
+                bq.question_id = #{questionId}
+            </if>
+        </set>
+        where bq.banner_id=#{bannerId}
+    </update>
+
+    <!--修改圈子Banner的图片-->
+    <update id="updateBCBanner">
+        update banner_circle bc
+        <set>
+            <if test="param2 != null and param2 != ''">
+                bc.img_url = #{param2}
+            </if>
+        </set>
+        where bc.banner_id=#{param1}
+    </update>
+
+    <!--//////////////////////////////////////////李静的代码,别动！！//////////////////////////////-->
+</mapper>

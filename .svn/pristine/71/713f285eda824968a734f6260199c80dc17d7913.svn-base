@@ -1,0 +1,145 @@
+package com.cn.web.controller;
+
+import com.cn.dto.JsonResult;
+import com.cn.pojo.Post;
+import com.cn.service.PostSerivce;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+
+@Controller
+@RestController
+@Api(tags = "尤翔龙",value = "帖子API")
+public class PostController {
+
+    @Autowired
+    private PostSerivce postSerivce;
+
+    /**
+     * 发表帖子
+     * @param post
+     * @return
+     */
+    @PostMapping("/post/add")
+    @ApiOperation(tags = "尤翔龙",value = "发表帖子")
+    @ApiImplicitParam(paramType = "body",name = "post",value = "帖子对象",required = true,dataType = "Post")
+    public JsonResult addPost(@RequestBody Post post){
+        return new JsonResult(200,"成功");
+    }
+
+    /**
+     * 删除帖子（软删）
+     * @param postId 需要删除的帖子ID
+     * @return
+     */
+    @PutMapping("/post/del")
+    @ApiOperation(tags = "尤翔龙",value = "删除帖子")
+    @ApiImplicitParam(paramType = "query",name = "postId",value = "帖子ID",required = true,dataType = "int")
+    public JsonResult deletePost(Integer postId){
+        return postSerivce.deleteByPostId(postId);
+    }
+
+    /**
+     * 修改帖子
+     * @param post
+     * @return
+     */
+    @PutMapping("/post/put")
+    @ApiOperation(tags = "尤翔龙",value = "修改帖子")
+    @ApiImplicitParam(paramType = "body",name = "post",value = "帖子对象",required = true,dataType = "Post")
+    public JsonResult updatePost(@RequestBody Post post){
+        return postSerivce.updatePost(post);
+    }
+
+    /**
+     * 通过ID查询帖子
+     * @param postId 帖子ID
+     * @return
+     */
+    @GetMapping("/post/findById")
+    @ApiOperation(tags = "尤翔龙",value = "查看帖子详情")
+    @ApiImplicitParam(paramType = "query",name = "postId",value = "帖子ID",required = true,dataType = "int")
+    public JsonResult findByPostId(Integer postId){
+        return new JsonResult(200,"成功");
+    }
+
+    /**
+     * 查询所有帖子（热门推荐）
+     * @return
+     */
+    @GetMapping("/post/list")
+    @ApiOperation(tags = "尤翔龙",value = "查询所有帖子（热门推荐）")
+    public JsonResult findAllPost(){
+        return null;
+    }
+
+    /**
+     * 收藏帖子
+     * @param userId 用户ID
+     * @param postId 帖子ID
+     * @return
+     */
+    @PostMapping("/post/col")
+    @ApiOperation(tags = "尤翔龙",value = "收藏帖子")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query",name = "userId",value = "用户ID",required = true,dataType = "int"),
+            @ApiImplicitParam(paramType = "query",name = "postId",value = "帖子ID",required = true,dataType = "int")
+    })
+    public JsonResult collectPost(Integer userId,Integer postId){
+
+        return postSerivce.collectPost(userId,postId);
+    }
+
+    /**
+     * 取消收藏帖子
+     * @param userId 用户ID
+     * @param postId 帖子ID
+     * @return
+     */
+    @PostMapping("/post/notcol")
+    @ApiOperation(tags = "尤翔龙",value = "取消收藏帖子")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query",name = "userId",value = "用户ID",required = true,dataType = "int"),
+            @ApiImplicitParam(paramType = "query",name = "postId",value = "帖子ID",required = true,dataType = "int")
+    })
+    public JsonResult notCollectPost(Integer userId,Integer postId){
+        return postSerivce.notCollectPost(userId,postId);
+    }
+
+    /**
+     * 给帖子点赞
+     * @param userId 用户ID
+     * @param postId 帖子ID
+     * @return
+     */
+    @PostMapping("/post/give")
+    @ApiOperation(tags = "尤翔龙",value = "给帖子点赞")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query",name = "userId",value = "用户ID",required = true,dataType = "int"),
+            @ApiImplicitParam(paramType = "query",name = "postId",value = "帖子ID",required = true,dataType = "int")
+    })
+    public JsonResult giveLikePost(Integer userId,Integer postId){
+        return postSerivce.giveLikePost(userId,postId);
+    }
+
+    /**
+     * 取消帖子点赞
+     * @param userId 用户ID
+     * @param postId 帖子ID
+     * @return
+     */
+    @PostMapping("/post/not")
+    @ApiOperation(tags = "尤翔龙",value = "取消帖子点赞")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query",name = "userId",value = "用户ID",required = true,dataType = "int"),
+            @ApiImplicitParam(paramType = "query",name = "postId",value = "帖子ID",required = true,dataType = "int")
+    })
+    public JsonResult notLikePost(Integer userId,Integer postId){
+        return postSerivce.notLikePost(userId,postId);
+    }
+
+}

@@ -1,0 +1,44 @@
+package com.cn.dao;
+
+import com.cn.pojo.Admin;
+import org.apache.ibatis.annotations.Param;
+
+/**
+ * Created with IntelliJ IDEA.
+ * User: wmy
+ * Date: 2019/11/28 9:32
+ * Description: 管理员Mapper
+ */
+public interface AdminMapper {
+
+    /**
+     * 根据呢称查找用户
+     * @param adminName
+     * @return
+     */
+    Admin findByAdminName(String adminName);
+
+
+    /**
+     * 根据账号和电话号码查询用户
+     * @param adminName
+     * @param adminPhone
+     * @return
+     */
+    Admin findByAdminPhoneAndAdminPhone(
+            @Param(value = "adminName") String adminName,
+            @Param(value = "adminPhone") String adminPhone);
+
+
+    /**
+     * 修改密码
+     * @param adminId
+     * @param adminPassword
+     * @return
+     */
+    Integer updateAdminPassword(
+            @Param(value = "adminId") Integer adminId,
+            @Param(value = "adminPassword") String adminPassword);
+
+
+}

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cn.dao.CircleMapper">
+    <!--查询小圈子列表-->
+    <select id="findAllCircle" resultType="com.cn.pojo.Circle">
+        select circle_id,circle_name,category_id,circle_url from circle
+    </select>
+    <!--根据大圈子ID查询小圈子ID-->
+    <select id="findById" resultType="com.cn.pojo.Circle">
+        select circle_id,circle_name,category_id,circle_url from circle where category_id=#{categoryId}
+    </select>
+
+    <!--根据小圈子ID查询小圈子-->
+    <resultMap id="circlrMap" type="Circle">
+        <result property="circleName" column="circle_name"/>
+        <result property="circleUrl" column="circlr_url"/>
+    </resultMap>
+    <select id="findByCirclrId" resultType="com.cn.pojo.Circle">
+        select circle_name,circle_url from circle where circle_id=#{circle_id}
+    </select>
+
+    <!-- ///////////////////////////////////////////////////-尤翔龙-/////////////////////////////////////////////////// -->
+    <!--通过圈子ID查询圈子名称-->
+    <select id="findNameById" resultType="com.cn.pojo.Circle">
+        select circle_name from circle where circle_id=#{circle_id}
+    </select>
+
+    <!--圈子与帖子 一对一关系映射-->
+    <resultMap id="circlrPost" type="Circle">
+        <id column="circle_id" property="circleId"/>
+        <result property="circleName" column="circle_name"/>
+    </resultMap>
+</mapper>

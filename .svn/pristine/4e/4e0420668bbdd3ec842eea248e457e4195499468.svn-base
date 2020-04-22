@@ -1,0 +1,29 @@
+package com.cn.dao;
+
+import com.cn.pojo.Post;
+
+
+public interface PostMapper {
+    /**
+     * 发帖的方法
+     * @param post:帖子的实体对象
+     * @return
+     */
+    Integer addPost(Post post);
+
+    /**
+     * 通过帖子ID删除帖子（软删）
+     * @author 尤翔龙
+     * @param postId
+     * @return
+     */
+     Boolean deleteByPostId(Integer postId);
+
+    /**
+     * 修改帖子内容
+     * @author 尤翔龙
+     * @param post
+     * @return
+     */
+     Integer updatePost(Post post);
+}

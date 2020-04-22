@@ -1,0 +1,13 @@
+package com.cn.service;
+
+import com.cn.dto.JsonResult;
+import com.cn.pojo.Question;
+
+/**
+ * @author Tyquan
+ * @date 2019/11/28 10:25
+ */
+public interface QuestionService {
+
+    JsonResult addQuestion(Question question);
+}

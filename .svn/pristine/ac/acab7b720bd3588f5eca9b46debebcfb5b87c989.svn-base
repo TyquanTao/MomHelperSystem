@@ -1,0 +1,109 @@
+package com.cn.pojo;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import java.sql.Timestamp;
+import java.util.List;
+
+public class Question {
+
+  private long questionId;
+  private String questionTitle;
+  private String questionContent;
+  private long userId;
+  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT-8")
+  private Timestamp questionTime;
+  private long questionDel;
+  private long questionPoints;
+  private long questionCollections;
+  /*问题和回答是一对多*/
+  private List<Answer> answers;
+
+  public Question() {
+  }
+
+  public Question(String questionTitle, String questionContent, Integer userId, Timestamp questionTime) {
+    this.questionTitle = questionTitle;
+    this.questionContent = questionContent;
+    this.userId = userId;
+    this.questionTime = questionTime;
+  }
+
+  public long getQuestionId() {
+    return questionId;
+  }
+
+  public void setQuestionId(long questionId) {
+    this.questionId = questionId;
+  }
+
+
+  public String getQuestionTitle() {
+    return questionTitle;
+  }
+
+  public void setQuestionTitle(String questionTitle) {
+    this.questionTitle = questionTitle;
+  }
+
+
+  public String getQuestionContent() {
+    return questionContent;
+  }
+
+  public void setQuestionContent(String questionContent) {
+    this.questionContent = questionContent;
+  }
+
+
+  public long getUserId() {
+    return userId;
+  }
+
+  public void setUserId(long userId) {
+    this.userId = userId;
+  }
+
+
+  public java.sql.Timestamp getQuestionTime() {
+    return questionTime;
+  }
+
+  public void setQuestionTime(java.sql.Timestamp questionTime) {
+    this.questionTime = questionTime;
+  }
+
+
+  public long getQuestionDel() {
+    return questionDel;
+  }
+
+  public void setQuestionDel(long questionDel) {
+    this.questionDel = questionDel;
+  }
+
+
+  public long getQuestionPoints() {
+    return questionPoints;
+  }
+
+  public void setQuestionPoints(long questionPoints) {
+    this.questionPoints = questionPoints;
+  }
+
+
+  public long getQuestionCollections() {
+    return questionCollections;
+  }
+
+  public void setQuestionCollections(long questionCollections) {
+    this.questionCollections = questionCollections;
+  }
+
+  public List<Answer> getAnswers() {
+    return answers;
+  }
+
+  public void setAnswers(List<Answer> answers) {
+    this.answers = answers;
+  }
+}

@@ -1,0 +1,162 @@
+package com.cn.service;
+
+import com.cn.dto.JsonResult;
+import com.cn.pojo.Post;
+import com.cn.pojo.vo.PostVo;
+
+import java.util.List;
+
+public interface PostSerivce {
+
+    /**
+     * 通过帖子ID删除帖子（软删）
+     * @author 尤翔龙
+     * @param postId
+     * @return
+     */
+    JsonResult<Post> deleteByPostId(Integer postId);
+
+    /**
+     * 修改帖子
+     * @author 尤翔龙
+     * @param post
+     * @return
+     */
+    JsonResult<Post> updatePost(Post post);
+
+    /**
+     * 收藏帖子
+     * @author 尤翔龙
+     * @param userId
+     * @param postId
+     * @return
+     */
+    JsonResult<Post> collectPost(Integer userId,Integer postId);
+
+    /**
+     * 取消收藏帖子
+     * @author 尤翔龙
+     * @param userId
+     * @param postId
+     * @return
+     */
+    JsonResult<Post> notCollectPost(Integer userId,Integer postId);
+
+    /**
+     * 帖子点赞
+     * @author 尤翔龙
+     * @param userId
+     * @param postId
+     * @return
+     */
+    JsonResult<Post> giveLikePost(Integer userId,Integer postId);
+
+    /**
+     * 取消帖子点赞
+     * @author 尤翔龙
+     * @param userId
+     * @param postId
+     * @return
+     */
+    JsonResult<Post> notLikePost(Integer userId,Integer postId);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/************************************************************************************/
+    /**
+     * 通过推荐状态查找所有帖子
+     * 周鑫
+     * @param recommendState 推荐状态 0 未推荐，1审核，2已推荐
+     * @return
+     */
+    JsonResult<PostVo> findAllByRecommendState(Integer page,Integer pagesize,Integer recommendState);
+
+}

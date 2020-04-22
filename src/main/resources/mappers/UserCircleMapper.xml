@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cn.dao.UserCircleMapper">
+    <!--用户关注圈子的方法-->
+    <insert id="addCircle" parameterType="int">
+        insert into user_circle(user_id, circle_id) values(#{userId},#{circleId})
+    </insert>
+    <!--取消用户关注圈子的方法-->
+    <delete id="delectCirclr">
+        delete from user_circle where user_id=#{userId} and circle_id=#{circleId}
+    </delete>
+    <!--用户是否关注了这个圈子-->
+    <select id="selectByUserId" resultType="com.cn.pojo.UserCircle">
+        select user_id,circle_id from user_circle where user_id=#{userId} and circle_id=#{circleId}
+    </select>
+    <!--用户关注的圈子列表-->
+    <resultMap id="CircleMap" type="UserCircle">
+        <result property="circleId" column="circle_id"/>
+        <association property="circles" column="circle_id" javaType="Circle"
+                    select="com.cn.dao.CircleMapper.findByCirclrId"/>
+    </resultMap>
+    <select id="findByUserId" resultMap="CircleMap" parameterType="int">
+        select circle_id from user_circle where user_id=#{userId}
+    </select>
+</mapper>

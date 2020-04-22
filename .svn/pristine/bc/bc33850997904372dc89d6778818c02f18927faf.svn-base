@@ -1,0 +1,10 @@
+package com.cn.service;
+
+import com.cn.dto.JsonResult;
+import com.cn.pojo.User;
+import io.swagger.models.auth.In;
+
+public interface Zp_UserService {
+
+    public JsonResult<User> login(Integer userPhone,String password);
+}

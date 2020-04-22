@@ -1,0 +1,114 @@
+package com.cn.service.impl;
+
+import com.cn.dao.UserMapper;
+import com.cn.dto.JsonResult;
+import com.cn.pojo.User;
+import com.cn.pojo.UserState;
+import com.cn.service.UserService;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+import java.sql.Timestamp;
+
+@Service
+@SuppressWarnings("all")
+public class UserServiceImpl implements UserService {
+
+    @Autowired
+    private UserMapper userMapper;
+
+    /**
+     * 登录方法
+     * @param userPhone：用户的手机号（登陆账号
+     * @param password：密码
+     *               张鹏
+     * @return
+     */
+    @Override
+    public JsonResult<User> login(Integer userPhone,String password) {
+        User login = userMapper.login(userPhone,password);
+        return new JsonResult<>(200,"success",login);
+    }
+
+    /**
+     * 判断用户的 状态
+     * @param id:用户的id
+     * @return
+     * 张鹏
+     */
+    @Override
+    public Boolean decideState(Integer id) {
+        UserState userState = userMapper.decideState(id);
+        if (userState.getStateId()==1){
+            return false;
+        }
+        return true;
+    }
+
+
+    @Override
+    public Boolean updateState(Integer userId, Integer stateId, Timestamp starttime) {
+        Integer integer = userMapper.updateState(userId, stateId,starttime);
+        System.out.println(integer);
+        if (integer>0){
+            return true;
+        }
+        return false;
+    }
+
+
+
+    ////////////////////////////////////////////////////管理员操作----李静的Mapper//////////////////////////////////////////////
+
+    /**
+     * 查找所有用户(含分页)
+     * @author 李静
+     * @param size
+     * @param sizePage
+     * @return
+     */
+    @Override
+    public PageInfo findAllUser(Integer size, Integer sizePage) {
+        PageHelper pageHelper = new PageHelper();
+
+        pageHelper.startPage(size, sizePage);
+        // 获取全部用户
+        List<User> users = userMapper.findAllUser();
+
+        return new PageInfo(users);
+    }
+
+    @Override
+    public Boolean updateUser(User user) {
+        Integer updateuser = userMapper.updateuser(user);
+        System.out.println(updateuser);
+        if (updateuser>0){
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public User findUserByUserid(Integer userId) {
+        User user = userMapper.findUser(userId);
+        if (user!=null){
+            return user;
+        }
+        return null;
+    }
+
+    @Override
+    public Integer countFants(Integer userId) {
+        Integer countFants = userMapper.countFants(userId);
+        return countFants;
+    }
+
+    @Override
+    public Boolean updateState(Integer userId, Integer stateId) {
+        return null;
+    }
+}

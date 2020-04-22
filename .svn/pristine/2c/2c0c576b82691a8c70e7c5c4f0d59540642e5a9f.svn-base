@@ -1,0 +1,65 @@
+package com.cn.web.controller;
+import com.cn.dto.JsonResult;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * 圈子API
+ */
+@RestController
+@Api(tags = "罗世杰",value = "小圈子API")
+public class CircleController {
+    /**
+     * 查询小圈子列表
+     * @return
+     */
+    @GetMapping("/circle/list")
+    @ApiOperation(tags = "罗世杰",value = "小圈子列表")
+    public JsonResult findAll(){
+        return null;
+    }
+
+    /**
+     * 按照圈子类别查询小圈子列表
+     * @param category_id
+     * @return
+     */
+    @GetMapping("/circle/byid/list")
+    @ApiOperation(tags = "罗世杰",value = "按照圈子大类查询小圈子列表")
+    @ApiImplicitParam(paramType = "query",name = "categoryId",value = "圈子大类ID",required = true,dataType = "int")
+    public JsonResult findById(Integer categoryId){
+        return null;
+    }
+
+    /**
+     * 用户关注的圈子列表
+     * @param userId
+     * @return
+     */
+    @GetMapping("/usercircle/list")
+    @ApiOperation(tags = "罗世杰",value = "用户关注的圈子列表")
+    public JsonResult findAll(Integer userId){
+        return null;
+    }
+
+    /**
+     * 用户关注圈子的方法
+     * @param userId:用户ID
+     * @param circleId：被关注的圈子ID
+     * @return
+     */
+    @GetMapping("/user/circle")
+    @ApiOperation(tags = "罗世杰",value = "用户关注圈子")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query",name = "usreId",value = "用户id",required = true,dataType = "int"),
+            @ApiImplicitParam(paramType = "query",name = "circleId",value = "被关注圈子id",required = true,dataType = "int")
+    })
+    public JsonResult addUserCiecle(Integer userId,Integer circleId){
+        return null;
+    }
+}

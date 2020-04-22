@@ -1,0 +1,17 @@
+package com.cn.pojo.vo;
+
+import com.cn.pojo.Circle;
+
+public class CircleVo extends Circle {
+
+    // 判断用户是否关注 0未关注 1关注
+    private Integer isFollow;
+
+    public Integer getIsFollow() {
+        return isFollow;
+    }
+
+    public void setIsFollow(Integer isFollow) {
+        this.isFollow = isFollow;
+    }
+}

@@ -1,0 +1,44 @@
+package com.cn.pojo;
+
+
+public class QuestionFabulous {
+
+  private long id;
+  private long userId;
+  private long questionFabulousId;
+
+  public QuestionFabulous() {
+  }
+
+  public QuestionFabulous(long userId, long questionFabulousId) {
+    this.userId = userId;
+    this.questionFabulousId = questionFabulousId;
+  }
+
+  public long getId() {
+    return id;
+  }
+
+  public void setId(long id) {
+    this.id = id;
+  }
+
+
+  public long getUserId() {
+    return userId;
+  }
+
+  public void setUserId(long userId) {
+    this.userId = userId;
+  }
+
+
+  public long getQuestionFabulousId() {
+    return questionFabulousId;
+  }
+
+  public void setQuestionFabulousId(long questionFabulousId) {
+    this.questionFabulousId = questionFabulousId;
+  }
+
+}

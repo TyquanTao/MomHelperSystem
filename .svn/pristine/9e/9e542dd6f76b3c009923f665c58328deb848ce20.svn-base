@@ -1,0 +1,115 @@
+package com.cn.service;
+
+import com.cn.dto.JsonResult;
+import com.cn.pojo.Question;
+
+import java.util.List;
+
+/**
+ * @author Tyquan
+ * @date 2019/11/28 10:25
+ */
+public interface QuestionService {
+    /**
+     * 添加问题
+     *
+     * @param question
+     * @return
+     */
+    JsonResult addQuestion(Question question);
+
+    /**
+     * 通过问题id查询问题（关联查询，并把当前问题的所有回答显示出来）
+     *
+     * @param questionId
+     * @return
+     */
+    JsonResult<Question> findQuestionById(Integer questionId,Integer userId);
+
+    /**
+     * 热门搜索（点赞数加收藏数排序）
+     * 查询所有问题
+     *
+     * @return
+     */
+    JsonResult<List<Question>> findAllByHot(Integer userId);
+
+    /**
+     * 待决解问题  点赞数+收藏数<40
+     *
+     * @param userId
+     * @return
+     */
+    JsonResult<List<Question>> findAllByUnsolved(Integer userId);
+
+    /**
+     * 通过问题标题模糊查询问题
+     * 搜索问题
+     *
+     * @return
+     */
+    JsonResult<List<Question>> findQuestionLikeTitle(Integer userId,String questionTitle);
+
+    /**
+     * 查询历史搜索
+     *
+     * @param userId
+     * @return
+     */
+    JsonResult findHistorySearch(Integer userId);
+
+    /**
+     * 删除历史记录
+     *
+     * @param userId
+     * @return
+     */
+    JsonResult delHistorySearch(Integer userId);
+
+    /**
+     * 查询热门搜索
+     * @return
+     */
+    JsonResult findHotSearch();
+
+    /**
+     * 收藏问题
+     *
+     * @param userId
+     * @param questionId
+     * @return
+     */
+    JsonResult collectQuestion(Integer userId,Integer questionId);
+
+    /**
+     * 取消收藏问题
+     *
+     * @param userId
+     * @param questionId
+     * @return
+     */
+    JsonResult cancelCollectQuestion(Integer userId,Integer questionId);
+    /**
+     * 点赞问题
+     * @param userId
+     * @param questionId
+     * @return
+     */
+    JsonResult praiseQuestion(Integer userId,Integer questionId);
+
+    /**
+     * 问题取消点赞
+     *
+     * @param userId
+     * @param questionId
+     * @return
+     */
+    JsonResult cancelPraiseQuestion(Integer userId,Integer questionId);
+
+    /**
+     * 正在提问的人数
+     * 只记录待解决问题
+     * @return
+     */
+    JsonResult numberOfQuestion();
+}

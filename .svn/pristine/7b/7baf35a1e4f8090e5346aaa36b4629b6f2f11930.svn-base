@@ -1,0 +1,54 @@
+package com.cn.web.controller;
+
+import com.cn.dto.JsonResult;
+import com.cn.pojo.Admin;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * Created with IntelliJ IDEA.
+ * User: wmy
+ * Date: 2019/11/27 10:43
+ * Description: 管理员
+ */
+@RestController
+@Api(tags = "文茂宇—管理员API",value = "管理员入口")
+public class AdminController {
+
+    /**
+     * 管理员登录
+     * @param adminName
+     * @param adminPassword
+     * @return
+     */
+        @PostMapping("/admin/login")
+        @ApiOperation(value = "管理员登录方法")
+        @ApiImplicitParams({
+                @ApiImplicitParam(paramType = "query",name = "adminName",value = "管理员呢称",required = true,dataType = "String"),
+                @ApiImplicitParam(paramType = "query",name = "adminPassword",value = "管理员密码",required = true,dataType = "String")
+        })
+        public JsonResult login(String adminName,String adminPassword){
+
+            return new JsonResult(200,"登录成功");
+        }
+
+    /**
+     * 管理员修改信息
+     * @param admin
+     * @return
+     */
+    @PostMapping("admin/update")
+        @ApiOperation(value = "修改信息")
+        @ApiImplicitParam(paramType = "query",name = "admin",value = "管理员信息",required = true,dataType = "Admin")
+        public JsonResult update(Admin admin){
+            return null;
+        }
+
+
+
+
+}

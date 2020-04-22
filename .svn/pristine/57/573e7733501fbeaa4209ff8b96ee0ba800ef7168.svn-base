@@ -1,0 +1,24 @@
+package com.cn.service.impl;
+
+import com.cn.dao.CircleMapper;
+import com.cn.dto.JsonResult;
+import com.cn.pojo.Circle;
+import com.cn.service.CircleService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class CircleServiceImpl implements CircleService {
+    @Autowired
+    private CircleMapper circleMapper;
+    @Override
+    public JsonResult findAllCircle() {
+        List<Circle> list=circleMapper.findAllCircle();
+        if(list!=null){
+            return new JsonResult(200,"success",list);
+        }
+        return new JsonResult(4000,"查询失败！");
+    }
+}

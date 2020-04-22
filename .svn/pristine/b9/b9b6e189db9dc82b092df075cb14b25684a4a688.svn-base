@@ -1,0 +1,233 @@
+package com.cn.service.impl;
+
+import com.cn.dao.PostMapper;
+import com.cn.dto.JsonResult;
+import com.cn.pojo.Post;
+import com.cn.pojo.vo.PostVo;
+import com.cn.service.PostSerivce;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+@Transactional(rollbackFor = Throwable.class)
+public class PostSerivceImpl implements PostSerivce {
+
+    @Autowired
+    private PostMapper postMapper;
+
+    /**
+     * 通过帖子ID删除帖子（软删）
+     * @author 尤翔龙
+     * @param postId
+     * @return
+     */
+    @Override
+    public JsonResult<Post> deleteByPostId(Integer postId) {
+        if (postId==null && postId ==0) {
+            return new JsonResult(4001,"参数错误");
+        }else {
+            Boolean temp = postMapper.deleteByPostId(postId);
+            if (temp) {
+                return new JsonResult(200,"删除成功");
+            }
+            return new JsonResult(4002,"删除失败");
+        }
+    }
+
+    /**
+     * 修改帖子
+     * @author 尤翔龙
+     * @param post
+     * @return
+     */
+    @Override
+    public JsonResult<Post> updatePost(Post post) {
+        if (post==null) {
+            return new JsonResult(4001,"参数错误");
+        }else{
+            Integer nums = postMapper.updatePost(post);
+            if (nums>0) {
+                return new JsonResult(200,"修改成功");
+            }
+        }
+        return new JsonResult(4003,"修改失败");
+    }
+
+    /**
+     * 收藏帖子
+     * @author 尤翔龙
+     * @param userId
+     * @param postId
+     * @return
+     */
+    @Override
+    public JsonResult<Post> collectPost(Integer userId,Integer postId) {
+        if (postId==null && userId==null && postId==0 && userId==0) {
+            return new JsonResult(4001,"参数错误");
+        }else{
+            Boolean temp = postMapper.collectPost(userId,postId);
+            if (temp) {
+                return new JsonResult(200,"收藏成功");
+            }
+        }
+        return new JsonResult(4004,"收藏失败");
+    }
+
+    /**
+     * 取消收藏帖子
+     * @author 尤翔龙
+     * @param userId
+     * @param postId
+     * @return
+     */
+    @Override
+    public JsonResult<Post> notCollectPost(Integer userId, Integer postId) {
+        if (postId==null && userId==null && postId==0 && userId==0) {
+            return new JsonResult(4001,"参数错误");
+        }else{
+            Boolean temp = postMapper.notCollectPost(userId,postId);
+            if (temp) {
+                return new JsonResult(200,"取消收藏成功");
+            }
+        }
+        return new JsonResult(4005,"取消收藏失败");
+    }
+
+    /**
+     * 帖子点赞
+     * @author 尤翔龙
+     * @param userId
+     * @param postId
+     * @return
+     */
+    @Override
+    public JsonResult<Post> giveLikePost(Integer userId, Integer postId) {
+        if (postId==null && userId==null && postId==0 && userId==0) {
+            return new JsonResult(4001,"参数错误");
+        }else{
+            Boolean temp = postMapper.giveLikePost(userId,postId);
+            if (temp) {
+                return new JsonResult(200,"点赞成功");
+            }
+        }
+        return new JsonResult(4006,"点赞失败");
+    }
+
+    /**
+     * 取消帖子点赞
+     * @author 尤翔龙
+     * @param userId
+     * @param postId
+     * @return
+     */
+    @Override
+    public JsonResult<Post> notLikePost(Integer userId, Integer postId) {
+        if (postId==null && userId==null && postId==0 && userId==0) {
+            return new JsonResult(4001,"参数错误");
+        }else{
+            Boolean temp = postMapper.notCollectPost(userId,postId);
+            if (temp) {
+                return new JsonResult(200,"取消点赞成功");
+            }
+        }
+        return new JsonResult(4007,"取消点赞失败");
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   /********************************************************************************************/
+    /**
+     * 通过推荐状态查找所有帖子
+     * 周鑫
+     * @param recommendState 推荐状态 0 未推荐，1审核，2已推荐
+     * @return
+     */
+   public JsonResult<PostVo> findAllByRecommendState(Integer page, Integer pagesize, Integer recommendState){
+
+
+       if(page==null && pagesize==null){
+           PageHelper.startPage(1, 10);
+           List<PostVo> list = postMapper.findAllByRecommendState(recommendState);
+            //将查询结果加入  pageInfo
+           PageInfo<PostVo> pageInfo = new PageInfo<>(list);
+           return new JsonResult(200,"查询成功",pageInfo);
+       }
+       PageHelper.startPage(page, pagesize);
+       List<PostVo> list = postMapper.findAllByRecommendState(recommendState);
+       //将查询结果加入  pageInfo
+       PageInfo<PostVo> pageInfo = new PageInfo<>(list);
+       return new JsonResult(200,"查询成功",pageInfo);
+   }
+
+}

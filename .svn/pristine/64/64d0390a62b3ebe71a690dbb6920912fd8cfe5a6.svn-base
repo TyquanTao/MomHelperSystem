@@ -1,0 +1,13 @@
+package com.cn.dao;
+
+import com.cn.pojo.Circle;
+
+import java.util.List;
+
+public interface CircleMapper {
+    /**
+     * @from:罗世杰
+     * @return
+     */
+    List<Circle> findAllCircle();
+}

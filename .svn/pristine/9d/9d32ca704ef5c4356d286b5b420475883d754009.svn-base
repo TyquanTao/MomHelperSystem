@@ -1,0 +1,171 @@
+package com.cn.service.impl;
+
+import com.aliyuncs.exceptions.ClientException;
+import com.cn.config.SystemConfig;
+import com.cn.dao.AdminMapper;
+import com.cn.dao.UserMapper;
+import com.cn.dto.JsonResult;
+import com.cn.pojo.Admin;
+import com.cn.pojo.Register;
+import com.cn.service.AdminService;
+import com.cn.utils.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+
+/**
+ * Created with IntelliJ IDEA.
+ * User: wmy
+ * Date: 2019/11/28 9:48
+ * Description:
+ */
+@SuppressWarnings("all")
+@Service
+@Transactional(rollbackFor = Throwable.class)
+public class AdminServiceImpl implements AdminService {
+
+    @Autowired
+    private AdminMapper adminMapper;
+
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private SystemConfig sysc;
+
+    @Override
+    public JsonResult<Admin> login(String adminName, String password) {
+        Admin dbAdmin = adminMapper.findByAdminName(adminName);
+        if(dbAdmin == null){
+            //用户不存在
+            return new JsonResult<>(4001,"没有该用户");
+        }
+
+        if(! dbAdmin.getAdminPassword().equals(MD5Util.MD55(password))){
+            return new JsonResult<>(4002,"密码不正确");
+        }
+        //把结果保存在token中
+        String token = JwtUtil.sign(dbAdmin, dbAdmin.getAdminId());
+
+        return new JsonResult(200,"登录成功",token,dbAdmin.getAdminId());
+    }
+
+    @Override
+    public JsonResult<Admin> findByAdminName(String adminName, String adminPhone) {
+        Admin byAdminName = adminMapper.findByAdminName(adminName);
+        if(byAdminName == null){
+            return new JsonResult(4001,"用户名错误，没有该用户");
+        }
+        Admin dbAdmin = adminMapper.findByAdminNameAndAdminPhone(adminName, adminPhone);
+        if(dbAdmin == null){
+            return new JsonResult(4011,"该手机号不是绑定的手机号");
+        }
+        String code = RandomNumberUtil.getCode();
+        try {
+            SendCodeUtil.sendSms(adminPhone,code);
+            //把手机号和验证码保存到临时表中
+            addRegister(new Register(adminPhone, code));
+            //验证码发送成功，并把需要修改的Id发送给前端保存起来
+            return new JsonResult(200,"验证码发送成功",code,dbAdmin.getAdminId());
+        } catch (ClientException e) {
+            e.printStackTrace();
+        }
+        return new JsonResult(4014,"验证码发送失败");
+    }
+
+    @Override
+    public JsonResult judgeCode(Register register) {
+        Register flag = userMapper.findRegisterAll(register);
+        if(flag == null){
+            return new JsonResult(4015,"验证码错误");
+        }
+        return new JsonResult(200,"验证码正确");
+    }
+
+    @Override
+    public JsonResult findByadminId(Integer adminId) {
+        Admin admin = adminMapper.findByAdminId(adminId);
+        return new JsonResult(200,"个人资料查询成功",admin);
+    }
+
+    @Override
+    public JsonResult updateMyselfe(Admin admin ,MultipartFile header) {
+        Admin dbAdmin = adminMapper.findByAdminId(admin.getAdminId());
+        String dbAdminPhone = adminMapper.findByAdminPhone(admin.getAdminPhone());
+        if(!admin.getAdminPhone().equals(dbAdmin) && dbAdminPhone != null){
+            return new JsonResult(4016,"该电话号码已经被注册，请重新输入");
+        }
+        System.out.println("---------+++++--------------");
+        System.out.println(header);
+        // 判断是否有文件上传过来
+        if (!header.isEmpty()) {
+            // 获取文件的名字
+            String filename = header.getOriginalFilename();
+            // 解析文件的后缀
+            String suffix = FileUtil.getSuffix(filename);
+            if (suffix == null) {
+                return new JsonResult(4003, "文件名不符合规范!");
+            }
+            // 判断后缀是否符合需求
+            String suffixs = sysc.getSuffixs();
+            if (!suffixs.contains(suffix)) {
+                return new JsonResult(4004, "文件类型不符合要求!");
+            }
+            // 获取唯一的文件名
+            String uploadFileName = FileUtil.getFileName();
+            // 获取文件保存的路径
+            String datePath = FileUtil.getDataFilePath();
+            // 获取文件保存的路径
+            String basePath = sysc.getBasePath();
+            // 先创建上传的路径
+            FileUtil.createDirs(basePath + datePath);
+            // 准备文件抽象的File对象
+            File file = new File(basePath + datePath + uploadFileName + suffix);
+            // 上传
+            try {
+                header.transferTo(file);
+                admin.setAdminImgUrl(basePath + datePath + uploadFileName + suffix);
+                System.out.println(admin.getAdminImgUrl());
+                Integer row = adminMapper.updateAdminMessage(admin);
+                if(row > 0){
+                    return new JsonResult(200,"个人信息修改成功");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return new JsonResult(4013,"个人信息修改失败");
+    }
+
+    @Override
+    public JsonResult<Admin> updateAdminPassword(Integer adminId, String adminPassword) {
+        if(adminId != null && adminPassword != null){
+            String md55 = MD5Util.MD55(adminPassword);
+            adminMapper.updateAdminPassword(adminId,md55);
+            return new JsonResult(200,"密码修改成功");
+        }
+        return new JsonResult(4020,"密码修改错误");
+    }
+
+
+    @Override
+    public Boolean addRegister(Register register) {
+        Register register1 = userMapper.findRegister(register.getRegisterPhone());
+        System.out.println("++++++++++++++++"+register1);
+        if (register1!=null){
+            Integer integer = userMapper.updateRegister(register);
+            System.out.println("++++++++11111+++++"+integer);
+            return true;
+        }else if(register1==null){
+            Integer integer = userMapper.addRegister(register);
+            System.out.println("+++++++22222++++++"+integer);
+            return true;
+        }
+        return false;
+    }
+
+}

@@ -1,0 +1,61 @@
+package com.cn.service;
+
+import com.aliyuncs.exceptions.ClientException;
+import com.cn.dto.JsonResult;
+import com.cn.pojo.Admin;
+import com.cn.pojo.Register;
+import org.springframework.web.multipart.MultipartFile;
+
+/**
+ * Created with IntelliJ IDEA.
+ * User: wmy
+ * Date: 2019/11/28 9:39
+ * Description:
+ */
+public interface AdminService {
+
+    /**
+     * 登录
+     * @param adminName
+     * @param password
+     * @return
+     */
+    JsonResult<Admin> login(String adminName,String password);
+
+    /**
+     * 通过账号和密码查找admin
+     * @param adminName
+     * @return
+     */
+    JsonResult<Admin> findByAdminName(String adminName,String adminPhone) throws ClientException;
+
+    /**
+     * 修改密码
+     * @param adminId
+     * @param adminPassword
+     * @return
+     */
+    JsonResult<Admin> updateAdminPassword(Integer adminId,String adminPassword);
+
+    /**
+     * 验证验证码是否正确
+     * @param register
+     * @return
+     */
+    JsonResult judgeCode(Register register);
+
+    /**
+     * 查询自己的资料
+     * @param adminId
+     * @return
+     */
+    JsonResult findByadminId(Integer adminId);
+
+    /**
+     * 修改个人资料
+     * @param admin
+     * @return
+     */
+    JsonResult updateMyselfe(Admin admin ,MultipartFile header);
+
+}

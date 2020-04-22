@@ -1,0 +1,37 @@
+package com.cn.exception;
+
+/**
+ * 用户数据抛出的异常
+ * @author lj
+ * @date 2019/11/28 16:14
+ */
+public class UserException extends Exception {
+    public UserException() {
+    }
+
+    public UserException(Integer code, String msg) {
+        super(msg);
+        this.code = code;
+        this.msg = msg;
+    }
+
+    private Integer code;
+
+    private String msg;
+
+    public Integer getCode() {
+        return code;
+    }
+
+    public void setCode(Integer code) {
+        this.code = code;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
+}

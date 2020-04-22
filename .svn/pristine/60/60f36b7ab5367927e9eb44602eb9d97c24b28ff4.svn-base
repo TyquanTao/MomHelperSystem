@@ -1,0 +1,21 @@
+package com.cn.service.impl;
+
+import com.cn.dao.Zp_UserMapper;
+import com.cn.dto.JsonResult;
+import com.cn.pojo.User;
+import com.cn.service.Zp_UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+@SuppressWarnings("all")
+public class Zp_UserServiceImpl implements Zp_UserService{
+
+    @Autowired
+    private Zp_UserMapper zp_userMapper;
+    @Override
+    public JsonResult<User> login(Integer userPhone,String password) {
+        User login = zp_userMapper.login(userPhone,password);
+        return new JsonResult<>(200,"success",login);
+    }
+}

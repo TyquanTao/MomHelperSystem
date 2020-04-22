@@ -1,0 +1,181 @@
+package com.cn.web.controller;
+
+import com.cn.dto.JsonResult;
+import com.cn.pojo.Question;
+import com.cn.service.QuestionService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.sql.Timestamp;
+import java.util.List;
+
+/**
+ * @author Tyquan
+ * @date 2019/11/27 15:49
+ */
+@Controller
+@ResponseBody
+@Api(tags = "陶仟-问题接口API", value = "QuestionAPI")
+public class QuestionController {
+
+    @Autowired
+    private QuestionService questionService;
+
+    private Question question;
+
+    /**
+     * 提交问题
+     *
+     * @param questionTitle   问题标题
+     * @param questionContent 问题的内容
+     * @return
+     */
+    @PostMapping("/question/addQuestion")
+    @ApiOperation(value = "提交问题接口")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "userId", value = "用户id", required = true, dataType = "int"),
+            @ApiImplicitParam(paramType = "query", name = "questionTitle", value = "问题标题", required = true, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "questionContent", value = "问题的内容", required = true, dataType = "String")
+    })
+    public JsonResult addQuestion(@RequestParam(value = "userId") Integer userId, @RequestParam(value = "questionTitle")String questionTitle, @RequestParam(value = "questionContent")String questionContent) {
+        System.out.println(userId+";"+questionTitle+";"+questionContent);
+        //得到当前系统时间
+        Timestamp questionTime = new Timestamp(System.currentTimeMillis());
+        //封装成question对象
+        question = new Question(questionTitle, questionContent, userId, questionTime);
+        //测试用
+        //Question question = new Question("怀孕妈妈抽烟么", "抽，对婴儿身体有好处", 20091, questionTime);
+        JsonResult jsonResult = questionService.addQuestion(question);
+        return jsonResult;
+    }
+
+    /**
+     * 查看问题详情
+     *
+     * @param questionId 要查看问题的问题id
+     * @return
+     */
+    @GetMapping("/question/questionDetail")
+    @ApiOperation(value = "问题详情接口")
+    @ApiImplicitParam(paramType = "query", name = "questionId", value = "查看问题的问题id", required = true, dataType = "int")
+    public JsonResult questionDetail(@RequestParam(value = "questionId") Integer questionId) {
+        JsonResult<Question> result = questionService.findQuestionById(questionId);
+        return result;
+    }
+
+    /**
+     * 查看热门问题
+     *
+     * @return
+     */
+    @PostMapping("/question/hotQuestion")
+    @ApiOperation(value = "查看热门问题接口")
+    public JsonResult hotQuestion() {
+        JsonResult<List<Question>> hotQuestions = questionService.findAllByHot();
+        return hotQuestions;
+    }
+
+    /**
+     * 查看未解决问题
+     *
+     * @return
+     */
+    @GetMapping("/question/unsolvedQuestion")
+    @ApiOperation(value = "查看未解决问题接口")
+    public JsonResult unsolvedQuestion() {
+        //封装对象
+        return null;
+    }
+
+    /**
+     * 普通搜索查询问题
+     *
+     * @param questionTitle
+     * @return
+     */
+    @GetMapping("/question/ordinarySearch")
+    @ApiOperation(value = "问题：普通搜索接口")
+    @ApiImplicitParam(paramType = "query", name = "questionTitle", value = "需要查询的内容", required = true, dataType = "String")
+    public JsonResult ordinarySearch(@RequestParam("questionTitle") String questionTitle) {
+        return questionService.findQuestionLikeTitle(questionTitle);
+    }
+
+    /**
+     * 查看热门搜索（所有用户）
+     *
+     * @return
+     */
+    @GetMapping("/question/hotSearch")
+    @ApiOperation(value = "问题：热门搜索接口")
+    public JsonResult hotSearch() {
+        JsonResult hotSearch = questionService.findHotSearch();
+        return hotSearch;
+    }
+
+    /**
+     * 查看历史搜索（当前用户）
+     *
+     * @return
+     */
+    @GetMapping("/question/historySearch")
+    @ApiOperation(value = "问题：历史搜索接口")
+    @ApiImplicitParam(paramType = "query", name = "userId", value = "用户id", required = true, dataType = "int")
+    public JsonResult historySearch(@RequestParam("userId") Integer userId) {
+        JsonResult result = questionService.findHistorySearch(userId);
+        return result;
+    }
+
+    /**
+     * 删除历史记录
+     *
+     * @param userId
+     * @return
+     */
+    @GetMapping("/question/delHistorySearch")
+    @ApiOperation(value = "删除历史搜索接口")
+    @ApiImplicitParam(paramType = "query", name = "userId", value = "用户id", required = true, dataType = "int")
+    public JsonResult delHistorySearch(@RequestParam("userId") Integer userId) {
+        return questionService.delHistorySearch(userId);
+    }
+    /**
+     * 收藏问题
+     *
+     * @param questionId 收藏的问题id
+     * @return
+     */
+    @GetMapping("/question/collectQuestion")
+    @ApiOperation(value = "问题：收藏问题")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "userId", value = "收藏的用户id", required = true, dataType = "int"),
+            @ApiImplicitParam(paramType = "query", name = "questionId", value = "收藏的问题id", required = true, dataType = "int")
+    })
+    public JsonResult collectQuestion(@RequestParam("userId") Integer userId,@RequestParam("questionId") Integer questionId) {
+        JsonResult result = questionService.collectQuestion(userId, questionId);
+        return result;
+    }
+
+    /**
+     * 问题点赞
+     *
+     * @param questionId
+     * @return
+     */
+    @GetMapping("/question/praiseQuestion")
+    @ApiOperation(value = "给回答点赞接口")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "userId", value = "收藏的用户id", required = true, dataType = "int"),
+            @ApiImplicitParam(paramType = "query", name = "questionId", value = "要被点赞的问题id", required = true, dataType = "int")
+    })
+    public JsonResult praiseQuestion(@RequestParam("userId") Integer userId,@RequestParam("questionId") Integer questionId) {
+
+        return null;
+    }
+}

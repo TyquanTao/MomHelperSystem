@@ -1,0 +1,129 @@
+package com.cn.service.impl;
+
+import com.cn.dao.QuestionMapper;
+import com.cn.dto.JsonResult;
+import com.cn.pojo.Question;
+import com.cn.pojo.QuestionCollection;
+import com.cn.pojo.QuestionFabulous;
+import com.cn.service.QuestionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+/**
+ * @author Tyquan
+ * @date 2019/11/28 10:25
+ */
+@Service
+@Transactional(rollbackFor = Throwable.class)
+public class QuestionServiceImpl implements QuestionService {
+
+    @Autowired
+    private QuestionMapper questionMapper;
+
+    @Override
+    public JsonResult addQuestion(Question question) {
+        //获得受影响的行数
+        Integer rows = questionMapper.addQuestion(question);
+        //
+        if (rows>0) {
+            Integer id = questionMapper.selectQuestionId(question);
+            return new JsonResult(200,"提交问题成功！",null,id);
+        }
+        return new JsonResult(408,"提交问题失败!");
+    }
+
+    @Override
+    public JsonResult<Question> findQuestionById(Integer questionId) {
+        //校验问题id
+        if (questionId == null) {
+            return new JsonResult<>(307,"问题id不能为空！");
+        }
+        Question question = questionMapper.findQuestionById(questionId);
+        if (question == null) {
+            return new JsonResult<>(404,"你查看的问题已不存在！");
+        }
+        return new JsonResult<>(200,"查询问题详情成功",question);
+    }
+
+    @Override
+    public JsonResult<List<Question>> findAllByHot() {
+        List<Question> hotQuestions = questionMapper.findAllByHot();
+        return new JsonResult<List<Question>>(200,"获取热门问题成功",hotQuestions);
+    }
+
+    @Override
+    public JsonResult<List<Question>> findQuestionLikeTitle(String questionTitle) {
+        List<Question> questions= questionMapper.findQuestionLikeTitle(questionTitle);
+        System.out.println("dsdad:"+questions);
+        return new JsonResult<>(200,"查询成功",questions);
+    }
+
+    @Override
+    public JsonResult findHistorySearch(Integer userId) {
+        if (userId == null) {
+            return new JsonResult(404,"用户id为空，没有历史记录");
+        }
+        List<String> historySearch = questionMapper.findHistorySearch(userId);
+        return new JsonResult(200,"获取历史记录成功！",historySearch);
+    }
+
+    @Override
+    public JsonResult delHistorySearch(Integer userId) {
+        Integer rows = questionMapper.delHistorySearchByUserId(userId);
+        if (rows == 0) {
+            return new JsonResult(408,"该用户没有搜索记录");
+        }
+        return new JsonResult(200,"删除历史记录成功！");
+    }
+
+    @Override
+    public JsonResult findHotSearch() {
+        List<String> hotSearch = questionMapper.findHotSearch();
+        return new JsonResult(200,"获取热门问题成功！",hotSearch);
+    }
+
+    @Override
+    public JsonResult collectQuestion(Integer userId, Integer questionId) {
+        //1.判断该用户是否已经收藏 是：不能继续收藏 否：执行2
+        QuestionCollection questionCollection = questionMapper.selectQuestionCollection(userId, questionId);
+        if (questionCollection != null) {
+            return new JsonResult(405,"你已经收藏该问题了，不能继续收藏！");
+        }
+        //2.在关系表中添加一条数据，添加成功后在问题表中更新收藏次数
+        Integer collectRow = questionMapper.addCollectQuestion(userId, questionId);
+        if (collectRow == 0) {
+            return new JsonResult(9999999,"添加数据失败!");
+        }
+        //3.在问题表中更新次数
+        Integer row = questionMapper.updateQuestionCollections(questionId);
+        if (row == 0){
+            return new JsonResult(9999999,"更新次数失败！");
+        }
+        return new JsonResult(200,"收藏成功！");
+    }
+
+    @Override
+    public JsonResult praiseQuestion(Integer userId, Integer questionId) {
+        //1 查询该用户是否已经点赞此问题
+        QuestionFabulous questionFabulous = new QuestionFabulous(userId,questionId);
+        QuestionFabulous questionFabulous1 = questionMapper.selectByQuestionFabulous(questionFabulous);
+        if (questionFabulous1 != null) {
+            return new JsonResult(405,"你已经给该问题点过赞了");
+        }
+        //2 把点赞记录 记录到关系表中
+        Integer row = questionMapper.addQuestionFabulous(questionFabulous);
+        if (row == 0) {
+            return new JsonResult(406,"点赞失败");
+        }
+        //3 回答表点赞次数加1
+        Integer points = questionMapper.updateQuestionPoints(questionId);
+        if (points == 0) {
+            return new JsonResult(407,"点赞成功！但数据库没有更新数据");
+        }
+        return new JsonResult(200,"点赞成功");
+    }
+
+}

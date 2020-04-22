@@ -1,0 +1,421 @@
+package com.cn.service.impl;
+
+import com.cn.dao.PostMapper;
+import com.cn.dto.JsonResult;
+import com.cn.pojo.Post;
+import com.cn.pojo.vo.PostVo;
+import com.cn.service.PostSerivce;
+import com.cn.utils.StringUtil;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+@Transactional(rollbackFor = Throwable.class)
+public class PostSerivceImpl implements PostSerivce {
+
+    @Autowired
+    private PostMapper postMapper;
+
+    /**
+     * 通过帖子ID删除帖子（软删）
+     * @author 尤翔龙
+     * @param postId
+     * @return
+     */
+    @Override
+    public JsonResult<Post> deleteByPostId(Integer postId) {
+        if (postId==null || postId ==0) {
+            return new JsonResult(4001,"参数错误");
+        }else {
+            Boolean temp = postMapper.deleteByPostId(postId);
+            if (temp) {
+                return new JsonResult(200,"删除成功");
+            }
+            return new JsonResult(4002,"删除失败");
+        }
+    }
+
+    /**
+     * 修改帖子
+     * @author 尤翔龙
+     * @param post
+     * @return
+     */
+    @Override
+    public JsonResult<Post> updatePost(Post post) {
+        if (post==null) {
+            return new JsonResult(4001,"参数错误");
+        }else{
+            Integer nums = postMapper.updatePost(post);
+            if (nums>0) {
+                return new JsonResult(200,"修改成功");
+            }
+        }
+        return new JsonResult(4003,"修改失败");
+    }
+
+    /**
+     * 收藏帖子
+     * @author 尤翔龙
+     * @param userId
+     * @param postId
+     * @return
+     */
+    @Override
+    public JsonResult<Post> collectPost(Integer userId,Integer postId) {
+        if (postId==null || userId==null || postId==0 || userId==0) {
+            return new JsonResult(4001,"参数错误");
+        }else{
+            Boolean temp = postMapper.collectPost(userId,postId);
+            if (temp) {
+                return new JsonResult(200,"收藏成功");
+            }
+        }
+        return new JsonResult(4004,"收藏失败");
+    }
+
+    /**
+     * 取消收藏帖子
+     * @author 尤翔龙
+     * @param userId
+     * @param postId
+     * @return
+     */
+    @Override
+    public JsonResult<Post> notCollectPost(Integer userId, Integer postId) {
+        if (postId==null || userId==null || postId==0 || userId==0) {
+            return new JsonResult(4001,"参数错误");
+        }else{
+            Boolean temp = postMapper.notCollectPost(userId,postId);
+            if (temp) {
+                return new JsonResult(200,"取消收藏成功");
+            }
+        }
+        return new JsonResult(4005,"取消收藏失败");
+    }
+
+    /**
+     * 帖子点赞
+     * @author 尤翔龙
+     * @param userId
+     * @param postId
+     * @return
+     */
+    @Override
+    public JsonResult<Post> giveLikePost(Integer userId, Integer postId) {
+        if (postId==null || userId==null || postId==0 || userId==0) {
+            return new JsonResult(4001,"参数错误");
+        }else{
+            Boolean temp = postMapper.giveLikePost(userId,postId);
+            if (temp) {
+                return new JsonResult(200,"点赞成功");
+            }
+        }
+        return new JsonResult(4006,"点赞失败");
+    }
+
+    /**
+     * 取消帖子点赞
+     * @author 尤翔龙
+     * @param userId
+     * @param postId
+     * @return
+     */
+    @Override
+    public JsonResult<Post> notLikePost(Integer userId, Integer postId) {
+        if (postId==null || userId==null || postId==0 || userId==0) {
+            return new JsonResult(4001,"参数错误");
+        }else{
+            Boolean temp = postMapper.notCollectPost(userId,postId);
+            if (temp) {
+                return new JsonResult(200,"取消点赞成功");
+            }
+        }
+        return new JsonResult(4007,"取消点赞失败");
+    }
+
+    /**
+     * 通过帖子ID查询单个帖子所有内容
+     * @author 尤翔龙
+     * @param postId
+     * @return
+     */
+    @Override
+    public JsonResult<Post> findByPostId(Integer postId) {
+        if (postId==null || postId==0) {
+            return new JsonResult(4001,"参数错误");
+        }else {
+            Post post = postMapper.findByPostId(postId);
+            if (post!=null) {
+                return new JsonResult(200,"查询成功",post);
+            }
+        }
+        return new JsonResult(4008,"查询失败");
+    }
+
+    /**
+     * 所有帖子查询（热门推荐）
+     * @author 尤翔龙
+     * @return
+     */
+    @Override
+    public JsonResult<Post> findAllPost() {
+        List<Post> posts = postMapper.findAllPost();
+        if (posts==null || posts.size()==0) {
+            return new JsonResult(4008,"查询失败");
+        }
+        return new JsonResult(200,"查询成功",posts);
+    }
+
+    /**
+     * 通过用户ID查询所关注用户的所有帖子
+     * @param userId
+     * @return
+     */
+    @Override
+    public JsonResult<Post> findFollowUserPost(Integer userId) {
+        if (userId==null || userId==0) {
+            return new JsonResult(4001,"参数错误");
+        }else{
+            List<Integer> followUserIds = postMapper.findFollowUserId(userId);
+            if (followUserIds!=null && followUserIds.size()>0) {
+                List<Post> posts = postMapper.findPostByFollowUserId(followUserIds);
+                if (posts!=null && posts.size()>0) {
+                    return new JsonResult(200,"查询成功",posts);
+                }
+            }
+        }
+        return new JsonResult(4008,"查询失败");
+    }
+
+
+    /********************************************************************************************/
+    /**
+     * 通过推荐状态查找所有帖子
+     * 周鑫
+     * @param page     当前页
+     * @param pagesize 显示条数
+     * @param recommendState 推荐状态 0 未推荐，1审核，2已推荐
+     * @return
+     */
+     @Override
+     public JsonResult<PostVo> findAllByRecommendState(Integer page, Integer pagesize, Integer recommendState){
+
+       if(page==null && pagesize==null){
+           PageHelper.startPage(1, 10);
+       }else if(page>0&&pagesize>0){
+           PageHelper.startPage(page, pagesize);
+       }else {
+           return new JsonResult(400,"页码参数错误");
+       }
+       List<PostVo> list = postMapper.findAllByRecommendState(recommendState);
+       //将查询结果加入  pageInfo
+       PageInfo<PostVo> pageInfo = new PageInfo<>(list);
+       return new JsonResult(200,"查询成功",pageInfo);
+      }
+
+    /**
+     * 通过推荐状态，条件查找帖子
+     * 周鑫
+     *  @param page     当前页
+     * @param pagesize 显示条数
+     * @param recommendState 推荐状态 0 未推荐，1审核，2已推荐
+     * @param postVo 条件参数
+     * @return
+     */
+     @Override
+     public JsonResult findAllByRecommendStateWhere(Integer page, Integer pagesize, Integer recommendState, PostVo postVo){
+       if(page==null && pagesize==null){
+           PageHelper.startPage(1, 10);
+       }else if(page>0&&pagesize>0){
+           PageHelper.startPage(page, pagesize);
+       }else {
+           return new JsonResult(400,"页码参数错误");
+       }
+       List<PostVo> list = postMapper.findAllByRecommendState(recommendState);
+
+       //将查询结果加入  pageInfo
+       PageInfo<PostVo> pageInfo = new PageInfo<>(list);
+       return new JsonResult(200,"查询成功",pageInfo);
+   }
+
+    /**
+     * 分页查询所有回收站的文章
+     *周鑫
+     * @param page     当前页
+     * @param pagesize 显示条数
+     * @return
+     */
+    @Override
+    public JsonResult findAllByDelPost(Integer page, Integer pagesize){
+        if(page==null && pagesize==null){
+            PageHelper.startPage(1, 10);
+        }else if(page>0&&pagesize>0){
+            PageHelper.startPage(page, pagesize);
+        }else {
+            return new JsonResult(400,"页码参数错误");
+        }
+        List<PostVo> list = postMapper.findAllByDelPost();
+        //将查询结果加入  pageInfo
+        PageInfo<PostVo> pageInfo = new PageInfo<>(list);
+        return new JsonResult(200,"查询成功",pageInfo);
+    }
+
+    /**
+     * 条件+分页查询回收站文章
+     *周鑫
+     * @param page     当前页
+     * @param pagesize 显示条数
+     * @param postVo     条件查询实体
+     * @return
+     */
+    @Override
+    public JsonResult findAllByDelPostWhere(Integer page, Integer pagesize, PostVo postVo){
+        if(page==null && pagesize==null){
+            PageHelper.startPage(1, 10);
+        }else if(page>0&&pagesize>0){
+            PageHelper.startPage(page, pagesize);
+        }else {
+            return new JsonResult(400,"页码参数错误");
+        }
+        List<PostVo> list  = postMapper.findAllByDelPostWhere(postVo);
+        //将查询结果加入  pageInfo
+        PageInfo<PostVo> pageInfo = new PageInfo<>(list);
+        return new JsonResult(200,"查询成功",pageInfo);
+    }
+    /**
+     *单个修改文章的推荐状态
+     * 周鑫
+     * @param recommendState 修改后的状态
+     * @param postId 修改文章ID
+     * @return
+     */
+    @Override
+   public JsonResult updateRecommend(Integer postId, Integer recommendState){
+       Integer row = postMapper.updateRecommendByID(recommendState, postId);
+        if(row!=null && row>0){
+            return  new JsonResult(200,"推荐状态设置成功");
+        }else{
+            return  new JsonResult(400,"设置失败");
+        }
+   }
+    /**
+     *批量修改文章的推荐状态
+     * 周鑫
+     * @param recommendState 修改后的状态
+     * @param postIds 修改文章ID
+     * @return
+     */
+    @Override
+    public JsonResult updateRecommend(Integer recommendState,String postIds){
+        Integer row = postMapper.updateRecommendByIds(recommendState,StringUtil.conversionIds(postIds));
+        if(row!=null && row>0){
+            return  new JsonResult(200,"推荐状态设置成功");
+        }else{
+            return  new JsonResult(400,"操作失败");
+        }
+    }
+
+    /**
+     * 假删单个帖子
+     * 周鑫
+     * @param postId 修改文章Id
+     * @return
+     */
+    @Override
+    public JsonResult removePost(Integer postId){
+        Integer row = postMapper.removePostById(postId);
+        if(row!=null && row>0){
+            return  new JsonResult(200,"删除成功");
+        }else{
+            return  new JsonResult(400,"设置失败");
+        }
+    }
+    /**
+     * 假删多个帖子
+     * 周鑫
+     * @param postIds 修改文章Id
+     * @return
+     */
+    @Override
+    public  JsonResult removePost(String postIds){
+        Integer row = postMapper.removePostByIds(StringUtil.conversionIds(postIds));
+        if(row!=null && row>0){
+            return  new JsonResult(200,"删除成功");
+        }else{
+            return  new JsonResult(400,"操作失败");
+        }
+    }
+
+    /**
+     * 恢复单个帖子
+     * 周鑫
+     * @param postId 修改文章Id
+     * @return
+     */
+    @Override
+   public JsonResult recoveryPost(Integer postId){
+       Integer row = postMapper.recoveryPostById(postId);
+       if(row!=null && row>0){
+           return  new JsonResult(200,"文件恢复成功");
+       }else{
+           return  new JsonResult(400,"操作失败");
+       }
+   }
+
+    /**
+     * 批量恢复帖子
+     * 周鑫
+     * @param postIds 修改文章Id
+     * @return
+     */
+    @Override
+    public JsonResult recoveryPost(String postIds){
+        Integer row = postMapper.recoveryPostByIds(StringUtil.conversionIds(postIds));
+        if(row!=null && row>0){
+            return  new JsonResult(200,"文件恢复成功");
+        }else{
+            return  new JsonResult(400,"操作失败");
+        }
+    }
+
+    /**
+     * 彻底删除帖子
+     * 周鑫
+     * @param postId 彻底删除文章Id
+     * @return
+     */
+    @Override
+    public JsonResult deletePost(Integer postId) {
+        Integer row = postMapper.deletePostById(postId);
+        if(row!=null && row>0){
+            return  new JsonResult(200,"彻底删除成功");
+        }else{
+            return  new JsonResult(400,"操作失败");
+        }
+    }
+
+    /**
+     * 批量彻底删除帖子
+     * 周鑫
+     * @param postIds 彻底删除文章Ids
+     * @return
+     */
+    @Override
+    public JsonResult deletePost(String postIds) {
+        Integer row = postMapper.deletePostByIds(StringUtil.conversionIds(postIds));
+        if(row!=null && row>0){
+            return  new JsonResult(200,"彻底删除成功");
+        }else{
+            return  new JsonResult(400,"操作失败");
+        }
+    }
+
+
+}

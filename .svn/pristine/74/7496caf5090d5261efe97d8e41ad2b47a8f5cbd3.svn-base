@@ -1,0 +1,57 @@
+package com.cn.service;
+
+import com.cn.dto.JsonResult;
+import com.cn.pojo.Comment;
+
+public interface CommentService {
+
+    /**
+     * 添加评论
+     * @author 尤翔龙
+     * @param comment
+     * @return
+     */
+    JsonResult<Comment> addComment(Comment comment);
+
+    /**
+     * 删除评论（软删）
+     * @author 尤翔龙
+     * @param commentId
+     * @return
+     */
+    JsonResult<Comment> deleteComment(Integer commentId);
+
+    /**
+     * 评论点赞
+     * @author 尤翔龙
+     * @param userId
+     * @param commentId
+     * @return
+     */
+    JsonResult<Comment> giveLikeComment(Integer userId,Integer commentId);
+
+    /**
+     * 取消评论点赞
+     * @author 尤翔龙
+     * @param userId
+     * @param commentId
+     * @return
+     */
+    JsonResult<Comment> notLikeComment(Integer userId,Integer commentId);
+
+    /**
+     * 通过帖子ID查询所有一级评论
+     * @author 尤翔龙
+     * @param postId
+     * @return
+     */
+    JsonResult<Comment> findAllComment(Integer postId);
+
+    /**
+     * 通过父级ID查询所有子评论
+     * @author 尤翔龙
+     * @param parentId
+     * @return
+     */
+    JsonResult<Comment> findAllCommentre(Integer parentId);
+}

@@ -1,0 +1,5 @@
+package com.cn.dao;
+
+public interface PostMapper {
+    public Integer
+}

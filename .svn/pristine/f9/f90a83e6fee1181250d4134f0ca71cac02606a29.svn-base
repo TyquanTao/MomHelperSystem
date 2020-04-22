@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cn.dao.AdminMapper">
+
+    <!--修改密码-->
+    <update id="updateAdminPassword">
+        update admin set admin_password = #{adminPassword} where adminId = #{adminId}
+    </update>
+    <!--修改个人信息-->
+    <update id="updateAdminMessage">
+        update admin set admin_nickName = #{adminNickName},admin_phone = #{adminPhone},admin_img_url = #{adminImgUrl}
+        where admin_id = #{adminId}
+    </update>
+
+    <!--根据呢称查询用户-->
+    <select id="findByAdminName" resultType="com.cn.pojo.Admin">
+        select * from admin where admin_name = #{adminName}
+    </select>
+
+    <!--通过电话和呢称查找-->
+    <select id="findByAdminNameAndAdminPhone" resultType="com.cn.pojo.Admin">
+        select * from admin where admin_name = #{adminName} and admin_phone = #{adminPhone}
+    </select>
+
+    <!--通过Id查询用户-->
+    <select id="findByAdminId" resultType="com.cn.pojo.Admin">
+        select * from admin where admin_id = #{adminId}
+    </select>
+    <!--判断电话号码是否注册-->
+    <select id="findByAdminPhone" resultType="java.lang.String">
+        select admin_phone from admin where admin_phone = #{adminPhone}
+    </select>
+
+    <!-- ///////////////////////////////////////////////////管理员操作-李静的Mapper,放在下面///////////////////////////////// -->
+
+    <!--查找所有管理员信息-->
+    <select id="findAllAdmin">
+        select user_id,user_name,user_phone,user_password,user_img_url,user_start_time,user_post_count,user_collect_count,user_birthday,user_del
+        from user where user_del=0
+    </select>
+
+    <!--查找所有管理员信息-->
+    <select id="findAllDelAdmin">
+        select user_id,user_name,user_phone,user_password,user_img_url,user_start_time,user_post_count,user_collect_count,user_birthday,user_del
+        from user where user_del=1
+    </select>
+
+    <!--&lt;!&ndash;模糊查询 根据管理员提供的 姓名模糊 及状态&ndash;&gt;
+    <select id="findUserByConditions" resultMap="userStateMap">
+        select user_id,user_name,user_phone,user_password,user_img_url,user_start_time,user_post_count,user_collect_count,user_birthday,user_del
+        from user u
+        left join user_state us on u.user_id=us.user_id
+        <where>
+            u.user_del = 0
+            &lt;!&ndash;'%${bussName}%'&ndash;&gt;
+            <if test="param1 != null and param1 != ''">
+                and u.user_name like concat('%',#{param1},'%')
+            </if>
+            <if test="param2 != null and param2 != 1">
+                and us.state_id = #{param2}
+            </if>
+        </where>
+    </select>-->
+
+    <!--根据管理员id查找管理员-->
+    <select id="findAdminById">
+        select user_id,user_name,user_phone,user_password,user_img_url,user_start_time,user_post_count,user_collect_count,user_birthday,user_del
+         from user where user_id=#{userId} order by user_id
+    </select>
+
+    <!--根据管理员id删除(假删)管理员-->
+    <update id="delAdmin">
+        update user set user_del = 1 where user_id=#{userId}
+    </update>
+
+    <!--根据管理员id组删除(假删)管理员-->
+    <update id="delAdmins">
+        update user set user_del = 1  where user_id in
+        <foreach collection="ids" index="index" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!--根据管理员id恢复管理员-->
+    <update id="resumeAdmin">
+        update user set user_del = 0 where user_id=#{userId}
+    </update>
+
+    <!--根据管理员id删除(真删)管理员-->
+    <delete id="deleteAdmin">
+        delete from user where user_id=#{userId}
+    </delete>
+
+    <!--根据管理员id组删除(真删)管理员-->
+    <update id="deleteAdmins">
+        delete from user where user_id in
+        <foreach collection="ids" index="index" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+    <!-- ///////////////////////////////////////////////////管理员操作-李静的Mapper下面///////////////////////////////// -->
+
+</mapper>

@@ -1,0 +1,13 @@
+package com.cn.dao;
+
+import com.cn.pojo.User;
+
+public interface Zp_UserMapper {
+
+    /**
+     * 通过账号密码登录
+     * @param userPhone
+     * @return
+     */
+    public User login(Integer userPhone,String password);
+}

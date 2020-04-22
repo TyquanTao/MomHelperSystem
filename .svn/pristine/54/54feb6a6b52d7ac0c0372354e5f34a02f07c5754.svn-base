@@ -1,0 +1,14 @@
+package com.cn.service;
+
+import com.cn.dto.JsonResult;
+import com.cn.pojo.Circle;
+
+import java.util.List;
+
+public interface CircleService {
+    /**
+     * 查询所有小圈子
+     * @return
+     */
+    JsonResult findAllCircle();
+}
